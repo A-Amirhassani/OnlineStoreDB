@@ -36,5 +36,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "description": "This is a web application for users to register, log in, post items, search for items, and leave reviews on items. The application is built with React.js, Express.js, and MySQL.",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC"
 }
