@@ -1,11 +1,10 @@
-import Axios from 'axios';
-// import React from 'react';
-import './App.css';
 import React, { useState } from 'react';
+import './App.css';
+import Axios from 'axios';
 
-function App ()
-{
-   // const [count, setCount] = useState(0);
+
+function App() {
+	// const [count, setCount] = useState(0);
 	const [usernameReg, setUernameReg] = useState('');
 	const [passwordReg, setPasswordReg] = useState('');
 

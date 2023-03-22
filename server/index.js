@@ -1,18 +1,22 @@
 const express = require("express");
-const app = express();
 const mysql = require( "mysql2" );
 const cors = require('cors');
 
-app.use(express.json());
+const app = express();
+
+app.use( express.json() );
+
+const db = mysql.createConnection({
+	user: 'root',
+	host: 'localhost',
+	password: 'root',
+	database: 'loginsystem',
+});
+
 app.listen(3001, () => {
    console.log("running server");
 } );
-const db = mysql.createConnection({
-   user: "root",
-   host: "localhost",
-   password: "root",
-   database: "loginsystem",
-} );
+
 
 app.post( '/register', ( req, res ) =>
 {
