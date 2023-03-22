@@ -43,7 +43,6 @@ function App() {
 				<input type="text" />
 				<br />
 				<label>password</label>
-				<input type="text" /> <br />
 				<input
 					type="text"
 					onChange={(e) => {
@@ -51,12 +50,7 @@ function App() {
 					}}
 				/>
 				<br />
-				<input
-					type="text"
-					onChange={(e) => {
-						setPasswordReg(e.target.value);
-					}}
-				/>{' '}
+				
 				<br />
 				<button onClick={register}> Register</button>
 			</div>
