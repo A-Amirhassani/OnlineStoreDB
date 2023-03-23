@@ -1,12 +1,17 @@
+import Axios from 'axios';
 import React, { useState } from 'react';
 import './App.css';
-import Axios from 'axios';
+
+
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
 	// const [count, setCount] = useState(0);
 	const [usernameReg, setUernameReg] = useState('');
-	const [passwordReg, setPasswordReg] = useState('');
+	const [ passwordReg, setPasswordReg ] = useState( '' );
+	 const [registerStatus, setRegisterStatus] = useState('');
 
 	const [username, setUername] = useState('');
 	const [password, setPassword] = useState('');
@@ -26,34 +31,63 @@ function App() {
 		});
 	};
 
+	// const register = () => {
+	// 	Axios.post('http://localhost:3001/register', {
+	// 		username: usernameReg,
+	// 		password: passwordReg,
+	// 	}).then((response) => {
+	// 		console.log( response );
+	// 		setRegisterStatus( response.data.message );
+	// 		toast.success('Registered successfully!');
+	// 	});
+	// };
+
 	const register = () => {
 		Axios.post('http://localhost:3001/register', {
 			username: usernameReg,
 			password: passwordReg,
-		}).then((response) => {
-			console.log(response);
-		});
+		})
+			.then((response) => {
+				console.log('register response:', response);
+				console.log('register data:', response.data);
+				setRegisterStatus(response.data);
+				toast.success('Registered successfully!');
+			})
+			.catch((error) => {
+				console.log('register error:', error);
+				setRegisterStatus('Error registering user.');
+			});
 	};
+
 
 	return (
 		<div className="App">
 			<div className="registration">
 				<h1>Registration</h1>
 				<label>Username</label>
-				<input type="text" />
+				<input
+					type="text"
+					name="username"
+					onChange={(e) => {
+						setUernameReg(e.target.value);
+					}}
+				/>
+
 				<br />
 				<label>password</label>
 				<input
 					type="text"
 					onChange={(e) => {
-						setUernameReg(e.target.value);
+						setPasswordReg(e.target.value);
 					}}
 				/>
+
 				<br />
-				
+
 				<br />
 				<button onClick={register}> Register</button>
 			</div>
+			<ToastContainer />
 			<div className="login">
 				<h1>Login</h1>
 				<input
