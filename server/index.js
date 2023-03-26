@@ -9,7 +9,7 @@ app.use(express.json());
 const db = mysql.createConnection({
 	user: 'root',
 	host: 'localhost',
-	password: 'root',
+	password: 'Comp{440}2023',
 	database: 'loginsystem',
 });
 db.connect((err) => {
@@ -24,9 +24,12 @@ app.listen(3001, () => {
 app.post('/register', (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
+	const firstName = req.body.firstName;
+	const lastName = req.body.lastName;
+	const email = req.body.email;
 	db.execute(
-		'INSERT INTO users (username, password) VALUES (?,?)',
-		[username, password],
+		'INSERT INTO users (username, password, firstName, lastName, email) VALUES (?,?,?,?,?)',
+		[username, password, firstName, lastName, email],
 		(err, result) => {
 			console.log(err);
 		}
