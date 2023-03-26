@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require( 'mysql2' );
+const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
@@ -15,7 +15,7 @@ const db = mysql.createConnection({
 db.connect((err) => {
 	if (err) throw err;
 	console.log('Connected!');
-} );
+});
 
 app.listen(3001, () => {
 	console.log('running server');
@@ -24,9 +24,12 @@ app.listen(3001, () => {
 app.post('/register', (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
+	const firstName = req.body.firstName;
+	const lastName = req.body.lastName;
+	const email = req.body.email;
 	db.execute(
-		'INSERT INTO users (username, password) VALUES (?,?)',
-		[username, password],
+		'INSERT INTO users (username, password, firstName, lastName, email) VALUES (?,?,?,?,?)',
+		[username, password, firstName, lastName, email],
 		(err, result) => {
 			console.log(err);
 		}
@@ -34,7 +37,7 @@ app.post('/register', (req, res) => {
 });
 app.use(
 	cors({
-		origin: ['http://localhost:3000'],
+		origin: ['http://localhost:3000/'],
 		methods: ['GET', 'POST'],
 		credentials: true,
 	})
