@@ -2,19 +2,22 @@ import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import bcrypt from 'bcryptjs' //for hasing passwords
+
+const salt = bcrypt.genSaltSync(10);
 
 function Register() {
 	const [usernameReg, setUernameReg] = useState('');
-  const [ passwordReg, setPasswordReg ] = useState( '' ); 
- const [confirmPassword, setConfirmPassword] = useState('');
-  const [ registerStatus, setRegisterStatus ] = useState( '' );
-  const [firstNameReg, setFirstNameReg] = useState('');
+	const [passwordReg, setPasswordReg ] = useState( '' ); 
+	const [confirmPassword, setConfirmPassword] = useState('');
+  	const [registerStatus, setRegisterStatus ] = useState( '' );
+  	const [firstNameReg, setFirstNameReg] = useState('');
 	const [lastNameReg, setLastNameReg] = useState('');
-  const [ emailReg, setEmailReg ] = useState( '' );
-   const [showPasswordError, setShowPasswordError] = useState(false);
-   const [ passwordMatch, setPasswordMatch ] = useState( false );
+  	const [emailReg, setEmailReg ] = useState( '' );
+   	const [showPasswordError, setShowPasswordError] = useState(false);
+   	const [passwordMatch, setPasswordMatch ] = useState( false );
   
-  const [passwordError, setPasswordError] = useState('');
+  	const [passwordError, setPasswordError] = useState('');
 
 
   useEffect( () =>
@@ -55,7 +58,7 @@ function Register() {
     
 		Axios.post('http://localhost:3001/register', {
 			username: usernameReg,
-			password: passwordReg,
+			password: bcrypt.hashSync(passwordReg, '$2a$10$CwTycUXWue0Thq9StjUM0u'),
 			firstName: firstNameReg,
 			lastName: lastNameReg,
 			email: emailReg,
@@ -94,7 +97,7 @@ function Register() {
 					}}
 				/>
 				<br />
-				<label>confirm password</label>
+				<label>Confirm Password</label>
 				<input
 					type="password"
 					name="confirmPassword"
