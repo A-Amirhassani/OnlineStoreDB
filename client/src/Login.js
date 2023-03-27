@@ -2,6 +2,8 @@ import Axios from 'axios';
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import bcrypt from 'bcryptjs' //for hasing passwords
+
 
 function Login() {
 	const [username, setUername] = useState('');
@@ -11,7 +13,7 @@ function Login() {
 	const login = () => {
 		Axios.post('http://localhost:3001/login', {
 			username: username,
-			password: password,
+			password: bcrypt.compare(password, '$2a$10$CwTycUXWue0Thq9StjUM0u'),
 		}).then((response) => {
 			if (!response.data.message) {
 				setLoginStatus(response.data.message);
