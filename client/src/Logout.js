@@ -11,7 +11,7 @@ function Logout() {
 	return (
 		<div>
 			<h2>Logout Page</h2>
-			<p>Welcome{localStorage.getItem('username')}!</p>
+			<p>Welcome, {localStorage.getItem('username')}!</p>
 			<button onClick={handleLogout}>Logout</button>
 		</div>
 	);

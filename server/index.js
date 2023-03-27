@@ -13,8 +13,7 @@ app.use(
 		credentials: true,
 	})
 );
-app.use( express.json() );
-
+app.use(express.json());
 
 const db = mysql.createConnection({
 	user: 'root',
