@@ -1,55 +1,58 @@
 import Axios from 'axios';
+import bcrypt from 'bcryptjs'; //for hasing passwords
 import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import bcrypt from 'bcryptjs' //for hasing passwords
-
 
 function Register() {
 	const [usernameReg, setUernameReg] = useState('');
-  const [ passwordReg, setPasswordReg ] = useState( '' ); 
- const [confirmPassword, setConfirmPassword] = useState('');
-  const [ registerStatus, setRegisterStatus ] = useState( '' );
-  const [firstNameReg, setFirstNameReg] = useState('');
+	const [passwordReg, setPasswordReg] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+	const [registerStatus, setRegisterStatus] = useState('');
+	const [firstNameReg, setFirstNameReg] = useState('');
 	const [lastNameReg, setLastNameReg] = useState('');
-  const [ emailReg, setEmailReg ] = useState( '' );
-   const [showPasswordError, setShowPasswordError] = useState(false);
-   const [ passwordMatch, setPasswordMatch ] = useState( false );
-  
-  const [passwordError, setPasswordError] = useState('');
+	const [emailReg, setEmailReg] = useState('');
+	const [showPasswordError, setShowPasswordError] = useState(false);
+	const [ passwordMatch, setPasswordMatch ] = useState( false );
+	const [emailError, setEmailError] = useState('');
 
-   const checkPasswordStrength = () => {
-			const passwordRegex =
-				/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
-			if (!passwordRegex.test(passwordReg)) {
-				setPasswordError(
-					'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
-				);
-				return false;
-			} else {
-				setPasswordError('');
-				return true;
-			}
+	const [passwordError, setPasswordError] = useState('');
+
+	const checkPasswordStrength = () => {
+		const passwordRegex =
+			/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
+		if (!passwordRegex.test(passwordReg)) {
+			setPasswordError(
+				'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+			);
+			return false;
+		} else {
+			setPasswordError('');
+			return true;
+		}
 	};
 	
-  useEffect( () =>
-  {
-		setPasswordMatch( passwordReg === confirmPassword );
-		
-	if (
-		passwordReg !== confirmPassword &&
-		passwordReg !== '' &&
-		confirmPassword !== ''
-	) {
-		setShowPasswordError(true);
-	} else {
-		setShowPasswordError(false);
-	}
-}, [passwordReg, confirmPassword]);
 
-  
-  const register = () =>
-  {
+	  const validateEmail = (email) => {
+			const re = /\S+@\S+\.\S+/;
+			return re.test(email);
+		};
+
+	useEffect(() => {
+		setPasswordMatch(passwordReg === confirmPassword);
+
+		if (
+			passwordReg !== confirmPassword &&
+			passwordReg !== '' &&
+			confirmPassword !== ''
+		) {
+			setShowPasswordError(true);
+		} else {
+			setShowPasswordError(false);
+		}
+	}, [passwordReg, confirmPassword]);
+
+	const register = () => {
 		if (
 			!usernameReg ||
 			!passwordReg ||
@@ -65,9 +68,15 @@ function Register() {
 			setRegisterStatus('Password and confirm password do not match.');
 			return;
 		}
-		 if (!checkPasswordStrength()) {
-				return;
-			}
+		if (!checkPasswordStrength()) {
+			return;
+		}
+		if (!validateEmail(emailReg)) {
+			setEmailError('Please enter a valid email address.');
+			return;
+		} else {
+			setEmailError('');
+		}
 
 		// Generate a salt
 		const salt = bcrypt.genSaltSync(10);
@@ -94,7 +103,7 @@ function Register() {
 			});
 	};
 
-  return (
+	return (
 		<>
 			<ToastContainer />
 			<div className="registration">
@@ -110,7 +119,7 @@ function Register() {
 				<br />
 				<label>password</label>
 				<input
-					type="text"
+					type="password"
 					onChange={(e) => {
 						setPasswordReg(e.target.value);
 					}}
@@ -151,6 +160,11 @@ function Register() {
 					type="text"
 					onChange={(e) => {
 						setEmailReg(e.target.value);
+						if (!validateEmail(e.target.value)) {
+							setEmailError('Please enter a valid email address.');
+						} else {
+							setEmailError('');
+						}
 					}}
 				/>
 				<br />
