@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
 	const [usernameReg, setUernameReg] = useState('');
-  	const [ passwordReg, setPasswordReg ] = useState( '' ); 
+  	const [passwordReg, setPasswordReg ] = useState( '' ); 
  	const [confirmPassword, setConfirmPassword] = useState('');
   	const [registerStatus, setRegisterStatus ] = useState( '' );
   	const [firstNameReg, setFirstNameReg] = useState('');
@@ -85,7 +85,7 @@ function Register() {
 					}}
 				/>
 				<br />
-				<label>password</label>
+				<label>Password</label>
 				<input
 					type="text"
 					onChange={(e) => {
@@ -93,7 +93,7 @@ function Register() {
 					}}
 				/>
 				<br />
-				<label>confirm password</label>
+				<label>Confirm Password</label>
 				<input
 					type="password"
 					name="confirmPassword"
