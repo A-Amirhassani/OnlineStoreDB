@@ -13,7 +13,7 @@ function Register() {
 	const [lastNameReg, setLastNameReg] = useState('');
 	const [emailReg, setEmailReg] = useState('');
 	const [showPasswordError, setShowPasswordError] = useState(false);
-	const [passwordMatch, setPasswordMatch ] = useState( false );
+	const [passwordMatch, setPasswordMatch] = useState(false);
 	const [emailError, setEmailError] = useState('');
 
 	const [passwordError, setPasswordError] = useState('');
@@ -31,12 +31,11 @@ function Register() {
 			return true;
 		}
 	};
-	
 
-	  const validateEmail = (email) => {
-			const re = /\S+@\S+\.\S+/;
-			return re.test(email);
-		};
+	const validateEmail = (email) => {
+		const re = /\S+@\S+\.\S+/;
+		return re.test(email);
+	};
 
 	useEffect(() => {
 		setPasswordMatch(passwordReg === confirmPassword);
@@ -117,7 +116,7 @@ function Register() {
 					}}
 				/>
 				<br />
-				<label>Password</label>
+				<label>password</label>
 				<input
 					type="password"
 					onChange={(e) => {
@@ -126,7 +125,7 @@ function Register() {
 				/>
 				{passwordError && <div className="error">{passwordError}</div>}
 				<br />
-				<label>Confirm Password</label>
+				<label>confirm password</label>
 				<input
 					type="password"
 					name="confirmPassword"

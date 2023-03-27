@@ -6,7 +6,14 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(
+	cors({
+		origin: ['http://localhost:3000'],
+		methods: ['GET', 'POST'],
+		credentials: true,
+	})
+);
 app.use(express.json());
 
 const db = mysql.createConnection({
@@ -76,4 +83,48 @@ app.post('/login', (req, res) => {
 		}
 	);
 });
-
+app.post('/initializeDB', (req, res) => {
+	db.execute(
+		'CREATE TABLE IF NOT EXISTS Classroom (' +
+			'building VARCHAR(15),' +
+			'room_number VARCHAR(7),' +
+			'capacity NUMERIC(4,0)' +
+			')',
+		(err, result) => {
+			if (err) {
+				console.error(err);
+				res.status(500).send('Error initializing table');
+			} else {
+				// res.send('Table initialized successfully');
+				db.execute(
+					'INSERT INTO Classroom (building, room_number, capacity) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)',
+					[
+						'Biology',
+						'101',
+						50,
+						'Chemistry',
+						'201',
+						40,
+						'Physics',
+						'301',
+						30,
+						'Math',
+						'401',
+						20,
+						'History',
+						'501',
+						10,
+					],
+					(err, result) => {
+						if (err) {
+							console.error(err);
+							res.status(500).send('Error initializing table');
+						} else {
+							res.send('Table initialized successfully');
+						}
+					}
+				);
+			}
+		}
+	);
+});
