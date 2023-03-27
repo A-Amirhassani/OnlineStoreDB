@@ -13,7 +13,7 @@ function Register() {
 	const [lastNameReg, setLastNameReg] = useState('');
 	const [emailReg, setEmailReg] = useState('');
 	const [showPasswordError, setShowPasswordError] = useState(false);
-	const [ passwordMatch, setPasswordMatch ] = useState( false );
+	const [passwordMatch, setPasswordMatch ] = useState( false );
 	const [emailError, setEmailError] = useState('');
 
 	const [passwordError, setPasswordError] = useState('');
@@ -117,7 +117,7 @@ function Register() {
 					}}
 				/>
 				<br />
-				<label>password</label>
+				<label>Password</label>
 				<input
 					type="password"
 					onChange={(e) => {
@@ -126,7 +126,7 @@ function Register() {
 				/>
 				{passwordError && <div className="error">{passwordError}</div>}
 				<br />
-				<label>confirm password</label>
+				<label>Confirm Password</label>
 				<input
 					type="password"
 					name="confirmPassword"
