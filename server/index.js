@@ -89,7 +89,35 @@ app.post('/initializeDB', (req, res) => {
 				console.error(err);
 				res.status(500).send('Error initializing table');
 			} else {
-				res.send('Table initialized successfully');
+				// res.send('Table initialized successfully');
+				db.execute(
+					'INSERT INTO Classroom (building, room_number, capacity) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)',
+					[
+						'Biology',
+						'101',
+						50,
+						'Chemistry',
+						'201',
+						40,
+						'Physics',
+						'301',
+						30,
+						'Math',
+						'401',
+						20,
+						'History',
+						'501',
+						10,
+					],
+					(err, result) => {
+						if (err) {
+							console.error(err);
+							res.status(500).send('Error initializing table');
+						} else {
+							res.send('Table initialized successfully');
+						}
+					}
+				);
 			}
 		}
 	);

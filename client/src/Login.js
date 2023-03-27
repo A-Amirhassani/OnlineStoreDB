@@ -70,12 +70,14 @@ function Login() {
 					setPassword(e.target.value);
 				}}
 			/>
+			<br />
 			<button disabled={isDisabled} onClick={login}>
 				Login
 			</button>
 			<h1> {loginStatus}</h1>
 			<p>Don't have an account?</p>
 			<Link to="/register">Create an account</Link>
+			<br />
 			<button onClick={initializeDB}>Initialize Database</button>
 		</div>
 	);
