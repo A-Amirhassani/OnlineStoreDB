@@ -1,6 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors');
+const cors = require( 'cors' );
+const bcrypt = require('bcrypt');
+
 
 const app = express();
 
@@ -48,20 +50,30 @@ app.post('/login', (req, res) => {
 	const password = req.body.password;
 
 	db.execute(
-		'SELECT * FROM users WHERE username = ? AND password = ?',
-		[username, password],
-		(err, result) => {
+		'SELECT * FROM users WHERE username = ?',
+		[username],
+		(err, results) => {
 			if (err) {
-					res.status(500).send({ message: 'Server error' });
-			}
-
-			if (result.length > 0) {
-				res.send(result);
+				res.status(500).send({ message: 'Server error' });
+			} else if (results.length === 0) {
+				res
+					.status(401)
+					.send({ message: 'Wrong username/password combination!' });
 			} else {
-				const errorMessage = 'Wrong username/password combination!';
-				console.error(errorMessage);
-				res.status(401).send({ message: errorMessage });
+				const user = results[0];
+				bcrypt.compare(password, user.password, (err, result) => {
+					if (err) {
+						res.status(500).send({ message: 'Server error' });
+					} else if (result) {
+						res.send(user);
+					} else {
+						res
+							.status(401)
+							.send({ message: 'Wrong username/password combination!' });
+					}
+				});
 			}
 		}
 	);
 });
+

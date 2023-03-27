@@ -2,6 +2,8 @@ import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import bcrypt from 'bcryptjs' //for hasing passwords
+
 
 function Register() {
 	const [usernameReg, setUernameReg] = useState('');
@@ -34,28 +36,31 @@ function Register() {
   
   const register = () =>
   {
-    
-     if (
-				!usernameReg ||
-				!passwordReg ||
-				!confirmPassword ||
-				!firstNameReg ||
-				!lastNameReg ||
-				!emailReg 
-			) {
-				setRegisterStatus('Please fill out all fields.');
-				return;
-			}
-			if (!passwordMatch) {
-				setRegisterStatus('Password and confirm password do not match.');
-        return;
-         
-  }
-    setRegisterStatus( '' );
-    
+		if (
+			!usernameReg ||
+			!passwordReg ||
+			!confirmPassword ||
+			!firstNameReg ||
+			!lastNameReg ||
+			!emailReg
+		) {
+			setRegisterStatus('Please fill out all fields.');
+			return;
+		}
+		if (!passwordMatch) {
+			setRegisterStatus('Password and confirm password do not match.');
+			return;
+		}
+
+		// Generate a salt
+		const salt = bcrypt.genSaltSync(10);
+		// Hash the password using the generated salt
+		const hashedPassword = bcrypt.hashSync(passwordReg, salt);
+		setRegisterStatus('');
+
 		Axios.post('http://localhost:3001/register', {
 			username: usernameReg,
-			password: passwordReg,
+			password: hashedPassword,
 			firstName: firstNameReg,
 			lastName: lastNameReg,
 			email: emailReg,
