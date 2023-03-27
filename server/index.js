@@ -1,8 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require( 'cors' );
+const cors = require('cors');
 const bcrypt = require('bcrypt');
-
 
 const app = express();
 
@@ -45,13 +44,7 @@ app.post('/register', (req, res) => {
 		}
 	);
 });
-app.use(
-	cors({
-		origin: ['http://localhost:3000/'],
-		methods: ['GET', 'POST'],
-		credentials: true,
-	})
-);
+
 app.post('/login', (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
