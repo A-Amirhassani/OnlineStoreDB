@@ -1,13 +1,20 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require( 'cors' );
+const cors = require('cors');
 const bcrypt = require('bcrypt');
-
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// app.use(cors());
+app.use(
+	cors({
+		origin: ['http://localhost:3000'],
+		methods: ['GET', 'POST'],
+		credentials: true,
+	})
+);
+app.use( express.json() );
+
 
 const db = mysql.createConnection({
 	user: 'root',
@@ -38,13 +45,7 @@ app.post('/register', (req, res) => {
 		}
 	);
 });
-app.use(
-	cors({
-		origin: ['http://localhost:3000/'],
-		methods: ['GET', 'POST'],
-		credentials: true,
-	})
-);
+
 app.post('/login', (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
@@ -76,4 +77,20 @@ app.post('/login', (req, res) => {
 		}
 	);
 });
-
+app.post('/initializeDB', (req, res) => {
+	db.execute(
+		'CREATE TABLE IF NOT EXISTS Classroom (' +
+			'building VARCHAR(15),' +
+			'room_number VARCHAR(7),' +
+			'capacity NUMERIC(4,0)' +
+			')',
+		(err, result) => {
+			if (err) {
+				console.error(err);
+				res.status(500).send('Error initializing table');
+			} else {
+				res.send('Table initialized successfully');
+			}
+		}
+	);
+});
