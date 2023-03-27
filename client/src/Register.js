@@ -146,6 +146,8 @@ function Register() {
 				</button>
 
 				<h1>{registerStatus}</h1>
+				<p>Already have an account?</p>
+				<a href="/login">Login</a>
 			</div>
 		</>
 	);

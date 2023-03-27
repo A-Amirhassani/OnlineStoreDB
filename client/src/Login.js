@@ -41,6 +41,8 @@ function Login() {
 			/>
 			<button onClick={login}>Login</button>
 			<h1> {loginStatus}</h1>
+			<p>Don't have an account?</p>
+			<a href="/register">Create an account</a>
 		</div>
 	);
 }
