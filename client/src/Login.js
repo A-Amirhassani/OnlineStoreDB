@@ -2,23 +2,47 @@ import Axios from 'axios';
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 function Login() {
 	const [username, setUername] = useState('');
 	const [password, setPassword] = useState('');
-	const [loginStatus, setLoginStatus] = useState('');
+	const [ loginStatus, setLoginStatus ] = useState( '' );
 
-	const login = () => {
+	const isDisabled = !username || !password;
+
+	const navigate = useNavigate();
+
+	const login = () =>
+	{
+		//  console.log(
+		// 		'Logging in with username:',
+		// 		username,
+		// 		'and password:',
+		// 		password
+		// 	);
 		Axios.post('http://localhost:3001/login', {
 			username: username,
 			password: password,
-		}).then((response) => {
-			if (!response.data.message) {
-				setLoginStatus(response.data.message);
-			} else {
-				setLoginStatus(response.data[0].message);
-			}
-		});
+		})
+			.then((response) => {
+				  if (response.data.length === 0) {
+						setLoginStatus('Username or password is incorrect');
+					} else {
+						setLoginStatus('Login successful!');
+						navigate('/logout');
+					}
+			})
+			.catch((error) => {
+				console.error(error.message);
+				if (error.response.status === 401) {
+					setLoginStatus('Username or password is incorrect');
+				} else {
+					setLoginStatus('An error occurred while logging in.');
+				}
+				
+			});
 	};
 
 	return (
@@ -39,10 +63,12 @@ function Login() {
 					setPassword(e.target.value);
 				}}
 			/>
-			<button onClick={login}>Login</button>
+			<button disabled={isDisabled} onClick={login}>
+				Login
+			</button>
 			<h1> {loginStatus}</h1>
 			<p>Don't have an account?</p>
-			<a href="/register">Create an account</a>
+			<Link to="/register">Create an account</Link>
 		</div>
 	);
 }

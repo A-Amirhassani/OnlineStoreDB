@@ -52,13 +52,15 @@ app.post('/login', (req, res) => {
 		[username, password],
 		(err, result) => {
 			if (err) {
-				res.send({ err: err });
+					res.status(500).send({ message: 'Server error' });
 			}
 
 			if (result.length > 0) {
 				res.send(result);
 			} else {
-				res.send({ message: 'Wrong username/password combination!' });
+				const errorMessage = 'Wrong username/password combination!';
+				console.error(errorMessage);
+				res.status(401).send({ message: errorMessage });
 			}
 		}
 	);
