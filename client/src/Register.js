@@ -18,10 +18,24 @@ function Register() {
   
   const [passwordError, setPasswordError] = useState('');
 
-
+   const checkPasswordStrength = () => {
+			const passwordRegex =
+				/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
+			if (!passwordRegex.test(passwordReg)) {
+				setPasswordError(
+					'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+				);
+				return false;
+			} else {
+				setPasswordError('');
+				return true;
+			}
+	};
+	
   useEffect( () =>
   {
-  setPasswordMatch(passwordReg === confirmPassword);
+		setPasswordMatch( passwordReg === confirmPassword );
+		
 	if (
 		passwordReg !== confirmPassword &&
 		passwordReg !== '' &&
@@ -51,6 +65,9 @@ function Register() {
 			setRegisterStatus('Password and confirm password do not match.');
 			return;
 		}
+		 if (!checkPasswordStrength()) {
+				return;
+			}
 
 		// Generate a salt
 		const salt = bcrypt.genSaltSync(10);
@@ -98,6 +115,7 @@ function Register() {
 						setPasswordReg(e.target.value);
 					}}
 				/>
+				{passwordError && <div className="error">{passwordError}</div>}
 				<br />
 				<label>confirm password</label>
 				<input
