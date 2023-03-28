@@ -18,7 +18,7 @@ app.use(express.json());
 const db = mysql.createConnection({
 	user: 'root',
 	host: 'localhost',
-	password: 'root',
+	password: 'Comp{440}2023',
 	database: 'loginsystem',
 });
 db.connect((err) => {
@@ -77,8 +77,9 @@ app.post('/login', (req, res) => {
 	);
 });
 app.post('/initializeDB', (req, res) => {
+	db.execute('DROP TABLE IF EXISTS `classroom`')
 	db.execute(
-		'CREATE TABLE IF NOT EXISTS Classroom (' +
+		'CREATE TABLE IF NOT EXISTS loginsystem.classroom (' +
 			'building VARCHAR(15),' +
 			'room_number VARCHAR(7),' +
 			'capacity NUMERIC(4,0)' +
@@ -90,7 +91,7 @@ app.post('/initializeDB', (req, res) => {
 			} else {
 				// res.send('Table initialized successfully');
 				db.execute(
-					'INSERT INTO Classroom (building, room_number, capacity) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)',
+					'INSERT INTO classroom (building, room_number, capacity) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)',
 					[
 						'Biology',
 						'101',
