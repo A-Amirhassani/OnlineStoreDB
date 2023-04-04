@@ -121,4 +121,21 @@ app.post('/initializeDB', (req, res) => {
 			}
 		}
 	);
+} );
+
+app.get('/api/items/nextId', (req, res) => {
+	const sql =
+		'SELECT AUTO_INCREMENT AS nextId FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?';
+	
+	const params = ['loginsystem', 'items'];
+	db.query(sql, params, (err, result) => {
+		if (err) {
+			console.log(err);
+			res.status(500).send('Error fetching next ID');
+			return;
+		}
+		res.send(result[0]);
+	});
 });
+
+
