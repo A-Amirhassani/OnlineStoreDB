@@ -77,7 +77,7 @@ app.post('/login', (req, res) => {
 	);
 });
 app.post('/initializeDB', (req, res) => {
-	db.execute('DROP TABLE IF EXISTS `classroom`')
+	db.execute('DROP TABLE IF EXISTS `classroom`');
 	db.execute(
 		'CREATE TABLE IF NOT EXISTS loginsystem.classroom (' +
 			'building VARCHAR(15),' +
@@ -121,12 +121,16 @@ app.post('/initializeDB', (req, res) => {
 			}
 		}
 	);
-} );
+});
+
+app.get('/', (req, res) => {
+	res.send('Server is running');
+});
 
 app.get('/api/items/nextId', (req, res) => {
 	const sql =
 		'SELECT AUTO_INCREMENT AS nextId FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?';
-	
+
 	const params = ['loginsystem', 'items'];
 	db.query(sql, params, (err, result) => {
 		if (err) {
@@ -134,8 +138,43 @@ app.get('/api/items/nextId', (req, res) => {
 			res.status(500).send('Error fetching next ID');
 			return;
 		}
-		res.send(result[0]);
+
+		// Convert the result to an array
+		const nextId = Array.from(result, (row) => row.nextId);
+
+		res.send(nextId);
 	});
+});
+
+
+app.post('/api/items', (req, res) => {
+	const newItem = req.body;
+	const title = newItem.title;
+	const description = newItem.description || null;
+	const category = newItem.category || null;
+	const price = newItem.price || null;
+
+	db.execute(
+		'INSERT INTO items (title, description, category, price) VALUES (?, ?, ?, ?)',
+		[title, description, category, price],
+		(err, result) => {
+			if (err) {
+				console.error(err);
+				res.status(500).send('Internal Server Error');
+			} else {
+				console.log(result);
+				const savedItem = {
+					id: result.insertId,
+					title,
+					description,
+					category,
+					price,
+					post_date: new Date().toISOString(),
+				};
+				res.status(201).json(savedItem);
+			}
+		}
+	);
 });
 
 

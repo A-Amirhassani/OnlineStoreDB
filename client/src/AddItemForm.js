@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-const API_URL = '/api/items';
+const API_URL = 'http://localhost:3001/api/items/nextId';
 
 function AddItemForm() {
 	const navigate = useNavigate();
@@ -22,7 +22,7 @@ function AddItemForm() {
   
   const fetchNextId = async () => {
 		try {
-			const response = await axios.get('/api/items/nextId');
+			const response = await axios.get(API_URL);
 			setId(response.data.nextId);
 		} catch (error) {
 			console.log(error);
@@ -30,21 +30,36 @@ function AddItemForm() {
 	};
 
 
-	useEffect( () =>
-  {
-     fetchNextId();
- axios
-		.get('API_URL')
-		.then((response) => {
-			const itemsPostedToday = response.data.filter(
-				(item) => item.postedDate === new Date().toISOString().substring(0, 10)
-			);
-			setNumItemsPostedToday(itemsPostedToday.length);
-		})
-		.catch((error) => {
-			console.log(error);
-		});
-}, [] );
+	useEffect(() => {
+		fetchNextId();
+		axios
+			.get(API_URL)
+			.then((response) => {
+				//console.log(typeof response.data);
+				if (Array.isArray(response.data)) {
+					// check if response.data is an array
+					const itemsPostedToday = response.data.filter(
+						(item) =>
+							item.postedDate &&
+							item.postedDate.substring(0, 10) ===
+								new Date().toISOString().substring(0, 10)
+					);
+					setNumItemsPostedToday(itemsPostedToday.length);
+					if (itemsPostedToday.length > 0) {
+						setLastPostedDate(
+							itemsPostedToday[
+								itemsPostedToday.length - 1
+							].postedDate.substring(0, 10)
+						);
+					}
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}, []);
+
+
 		const handleSubmit = (event) => {
       event.preventDefault();
       
@@ -69,7 +84,7 @@ function AddItemForm() {
 			};
 
 			axios
-				.post(API_URL, newItem)
+				.post('http://localhost:3001/api/items', newItem)
 				.then((response) => {
 					setNumItemsPostedToday(numItemsPostedToday + 1);
 					navigate('/');
