@@ -3,71 +3,48 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:3001/api/items/nextId';
+const API_URL = 'http://localhost:3001/api/items';
 
 function AddItemForm() {
 	const navigate = useNavigate();
-
-  const [ numItemsPostedToday, setNumItemsPostedToday ] = useState( 0 );
-  const [ id, setId ] = useState( 0 );
-  
-  const [lastPostedDate, setLastPostedDate] = useState(null);
-
-
-
+	const [numItemsPostedToday, setNumItemsPostedToday] = useState(0);
+	// const [ id, setId ] = useState( 0 );
+	// const [lastPostedDate, setLastPostedDate] = useState(null);
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [category, setCategory] = useState('');
-  const [ price, setPrice ] = useState( '' );
-  
-  const fetchNextId = async () => {
-		try {
-			const response = await axios.get(API_URL);
-			setId(response.data.nextId);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
+	const [price, setPrice] = useState('');
+	const username = localStorage.getItem('username');
 
 	useEffect(() => {
-		fetchNextId();
+		const today = new Date().toISOString().slice(0, 10);
+
 		axios
-			.get(API_URL)
+			.get(API_URL, {
+				params: {
+					post_date: today,
+				},
+			})
 			.then((response) => {
-				//console.log(typeof response.data);
-				if (Array.isArray(response.data)) {
-					// check if response.data is an array
-					const itemsPostedToday = response.data.filter(
-						(item) =>
-							item.postedDate &&
-							item.postedDate.substring(0, 10) ===
-								new Date().toISOString().substring(0, 10)
-					);
-					setNumItemsPostedToday(itemsPostedToday.length);
-					if (itemsPostedToday.length > 0) {
-						setLastPostedDate(
-							itemsPostedToday[
-								itemsPostedToday.length - 1
-							].postedDate.substring(0, 10)
-						);
-					}
-				}
+				setNumItemsPostedToday(response.data.length);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
 	}, []);
 
+	const handleSubmit = (event) => {
+		event.preventDefault();
 
-		const handleSubmit = (event) => {
-      event.preventDefault();
-      
-      const now = new Date();
-			const today = now.toISOString().substring(0, 10);
-			const lastPostedToday = lastPostedDate === today;
+		const now = new Date();
+		const today = now.toISOString().substring(0, 10);
 
-			if (lastPostedToday && numItemsPostedToday >= 3) {
+		axios.get(API_URL).then((response) => {
+			const itemsPostedToday = response.data.filter(
+				(item) => item.post_date === today
+			);
+
+			if (itemsPostedToday.length >= 3) {
 				alert(
 					'You have already posted 3 items today. Please try again tomorrow.'
 				);
@@ -75,24 +52,29 @@ function AddItemForm() {
 			}
 
 			const newItem = {
-				id,
 				title,
 				description,
 				category,
 				price,
-				postedDate: today,
+				post_date: today,
+				username,
 			};
 
 			axios
 				.post('http://localhost:3001/api/items', newItem)
 				.then((response) => {
 					setNumItemsPostedToday(numItemsPostedToday + 1);
-					navigate('/');
+					console.log('numItemsPostedToday:', numItemsPostedToday);
+					navigate('/dashboard');
 				})
 				.catch((error) => {
 					console.log(error);
 				});
-		};
+		});
+	};
+
+	//  console.log('lastPostedDate:', lastPostedDate);
+	console.log('numItemsPostedToday:', numItemsPostedToday);
 
 	return (
 		<div>

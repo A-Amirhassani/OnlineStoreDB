@@ -1,22 +1,25 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import Axios from 'axios';
 
 function Logout() {
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
-		localStorage.removeItem('isLoggedIn');
-		navigate('/login');
+		Axios.post('http://localhost:3001/logout', {
+			username: localStorage.getItem('username'),
+		})
+			.then(() => {
+				localStorage.removeItem('isLoggedIn');
+				localStorage.removeItem('username');
+				navigate('/login');
+			})
+			.catch((error) => {
+				console.error(error.message);
+			});
 	};
 
-	return (
-		<div>
-			<h2>Logout Page</h2>
-			<p>Welcome, {localStorage.getItem('username')}!</p>
-			<Link to="/add-item">Add Item</Link>
-			<button onClick={handleLogout}>Logout</button>
-		</div>
-	);
+	return <button onClick={handleLogout}>Logout</button>;
 }
 
 export default Logout;

@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 
 const app = express();
+const session = require('express-session');
 
 // app.use(cors());
 app.use(
@@ -14,6 +15,18 @@ app.use(
 	})
 );
 app.use(express.json());
+
+app.use(
+	session({
+		secret: 'your-secret-key',
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+		},
+	})
+);
 
 const db = mysql.createConnection({
 	user: 'root',
@@ -65,6 +78,8 @@ app.post('/login', (req, res) => {
 					if (err) {
 						res.status(500).send({ message: 'Server error' });
 					} else if (result) {
+						// Store user object in session
+						req.session.user = user;
 						res.send(user);
 					} else {
 						res
@@ -76,6 +91,15 @@ app.post('/login', (req, res) => {
 		}
 	);
 });
+
+app.get('/me', (req, res) => {
+	if (req.session.user) {
+		res.send(req.session.user);
+	} else {
+		res.status(401).send({ message: 'Not authenticated' });
+	}
+});
+
 app.post('/initializeDB', (req, res) => {
 	db.execute('DROP TABLE IF EXISTS `classroom`');
 	db.execute(
@@ -123,6 +147,18 @@ app.post('/initializeDB', (req, res) => {
 	);
 });
 
+app.post('/logout', (req, res) => {
+	try {
+		res.clearCookie('sessionId');
+		// additional session data clearing code here if needed
+		req.session.destroy(); // destroy the session
+		res.sendStatus(200);
+	} catch (error) {
+		console.error('Error clearing session data:', error);
+		res.sendStatus(500);
+	}
+});
+
 app.get('/', (req, res) => {
 	res.send('Server is running');
 });
@@ -146,17 +182,17 @@ app.get('/api/items/nextId', (req, res) => {
 	});
 });
 
-
 app.post('/api/items', (req, res) => {
 	const newItem = req.body;
 	const title = newItem.title;
 	const description = newItem.description || null;
 	const category = newItem.category || null;
 	const price = newItem.price || null;
+	const username = newItem.username || null;
 
 	db.execute(
-		'INSERT INTO items (title, description, category, price) VALUES (?, ?, ?, ?)',
-		[title, description, category, price],
+		'INSERT INTO items (title, description, category, price, username) VALUES (?, ?, ?, ?, ?)',
+		[title, description, category, price, username],
 		(err, result) => {
 			if (err) {
 				console.error(err);
@@ -170,6 +206,7 @@ app.post('/api/items', (req, res) => {
 					category,
 					price,
 					post_date: new Date().toISOString(),
+					username,
 				};
 				res.status(201).json(savedItem);
 			}
@@ -177,4 +214,20 @@ app.post('/api/items', (req, res) => {
 	);
 });
 
+app.get('/api/items', (req, res) => {
+	const postDate = req.query.post_date;
+
+	const sql = 'SELECT * FROM items WHERE post_date = ?';
+	const params = [postDate];
+
+	db.query(sql, params, (err, result) => {
+		if (err) {
+			console.log(err);
+			res.status(500).send('Error fetching items');
+			return;
+		}
+
+		res.send(result);
+	});
+});
 
