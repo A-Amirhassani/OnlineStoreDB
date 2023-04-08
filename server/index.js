@@ -183,36 +183,69 @@ app.get('/api/items/nextId', (req, res) => {
 });
 
 app.post('/api/items', (req, res) => {
-	const newItem = req.body;
-	const title = newItem.title;
-	const description = newItem.description || null;
-	const category = newItem.category || null;
-	const price = newItem.price || null;
-	const username = newItem.username || null;
+	if (!req.session.user) {
+		res.status(401).send('User not authenticated');
+		return;
+	}
+
+	const username = req.session.user.username;
+	console.log(`User ${username} is attempting to add an item`);
+	const today = new Date().toISOString().slice(0, 10);
 
 	db.execute(
-		'INSERT INTO items (title, description, category, price, username) VALUES (?, ?, ?, ?, ?)',
-		[title, description, category, price, username],
+		'SELECT COUNT(*) as itemCount FROM items WHERE username = ? AND DATE(post_date) = ?',
+		[username, today],
 		(err, result) => {
 			if (err) {
 				console.error(err);
 				res.status(500).send('Internal Server Error');
-			} else {
-				console.log(result);
-				const savedItem = {
-					id: result.insertId,
-					title,
-					description,
-					category,
-					price,
-					post_date: new Date().toISOString(),
-					username,
-				};
-				res.status(201).json(savedItem);
+				return;
 			}
+
+			 const count = result[0].itemCount;
+				if (count >= 3) {
+					res
+						.status(429)
+						.json({ message: 'You can only add up to 3 items per day.' });
+					return;
+				}
+
+			if (result[0].itemCount >= 3) {
+				res.status(400).send('You can only add 3 items per day');
+				return;
+			}
+
+			const newItem = req.body;
+			const title = newItem.title;
+			const description = newItem.description || null;
+			const category = newItem.category || null;
+			const price = newItem.price || null;
+
+			db.execute(
+				'INSERT INTO items (username, title, description, category, price) VALUES (?, ?, ?, ?, ?)',
+				[username, title, description, category, price],
+				(err, result) => {
+					if (err) {
+						console.error(err);
+						res.status(500).send('Internal Server Error');
+					} else {
+						console.log(result);
+						const savedItem = {
+							id: result.insertId,
+							title,
+							description,
+							category,
+							price,
+							post_date: new Date().toISOString(),
+						};
+						res.status(201).json(savedItem);
+					}
+				}
+			);
 		}
 	);
 });
+
 
 app.get('/api/items', (req, res) => {
 	const postDate = req.query.post_date;

@@ -1,12 +1,10 @@
 import Axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
-function Login ( props )
-{
+function Login(props) {
 	const { setIsAuthenticated } = props;
 	const [username, setUername] = useState('');
 	const [password, setPassword] = useState('');
@@ -19,8 +17,8 @@ function Login ( props )
 	useEffect(() => {
 		// Clear login status on component mount
 		setLoginStatus('');
-	}, [] );
-	
+	}, []);
+
 	useEffect(() => {
 		const isLoggedIn = localStorage.getItem('isLoggedIn');
 		if (isLoggedIn) {
@@ -39,16 +37,17 @@ function Login ( props )
 	};
 
 	const login = () => {
-		//  console.log(
-		// 		'Logging in with username:',
-		// 		username,
-		// 		'and password:',
-		// 		password
-		// 	);
-		Axios.post('http://localhost:3001/login', {
-			username: username,
-			password: password,
-		})
+		Axios.post(
+			'http://localhost:3001/login',
+			{
+				username: username,
+				password: password,
+			},
+			{
+				withCredentials: true,
+			}
+		)
+
 			.then((response) => {
 				console.log('Response:', response && response.data);
 
@@ -61,15 +60,18 @@ function Login ( props )
 						localStorage.getItem('username')
 					);
 					console.log('responseData:', response.data);
-					console.log( 'responseData.username:', response.data.username );
+					console.log('responseData.username:', response.data.username);
 					localStorage.setItem('isLoggedIn', true);
 					localStorage.setItem('username', response.data.username);
 					console.log(
 						'After setting username in local storage:',
 						localStorage.getItem('username'),
 						setIsAuthenticated(true),
-          navigate('/dashboard'),
-          console.log('After setting username in local storage:', localStorage.getItem('username')),
+						navigate('/dashboard'),
+						console.log(
+							'After setting username in local storage:',
+							localStorage.getItem('username')
+						)
 					);
 				}
 			})
