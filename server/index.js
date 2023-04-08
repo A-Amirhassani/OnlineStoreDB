@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 
 const app = express();
+const session = require('express-session');
 
 // app.use(cors());
 app.use(
@@ -14,6 +15,18 @@ app.use(
 	})
 );
 app.use(express.json());
+
+app.use(
+	session({
+		secret: 'your-secret-key',
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+		},
+	})
+);
 
 const db = mysql.createConnection({
 	user: 'root',
@@ -65,6 +78,8 @@ app.post('/login', (req, res) => {
 					if (err) {
 						res.status(500).send({ message: 'Server error' });
 					} else if (result) {
+						// Store user object in session
+						req.session.user = user;
 						res.send(user);
 					} else {
 						res
@@ -76,9 +91,19 @@ app.post('/login', (req, res) => {
 		}
 	);
 });
+
+app.get('/me', (req, res) => {
+	if (req.session.user) {
+		res.send(req.session.user);
+	} else {
+		res.status(401).send({ message: 'Not authenticated' });
+	}
+});
+
 app.post('/initializeDB', (req, res) => {
+	db.execute('DROP TABLE IF EXISTS `classroom`');
 	db.execute(
-		'CREATE TABLE IF NOT EXISTS Classroom (' +
+		'CREATE TABLE IF NOT EXISTS loginsystem.classroom (' +
 			'building VARCHAR(15),' +
 			'room_number VARCHAR(7),' +
 			'capacity NUMERIC(4,0)' +
@@ -90,7 +115,7 @@ app.post('/initializeDB', (req, res) => {
 			} else {
 				// res.send('Table initialized successfully');
 				db.execute(
-					'INSERT INTO Classroom (building, room_number, capacity) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)',
+					'INSERT INTO classroom (building, room_number, capacity) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)',
 					[
 						'Biology',
 						'101',
@@ -121,3 +146,121 @@ app.post('/initializeDB', (req, res) => {
 		}
 	);
 });
+
+app.post('/logout', (req, res) => {
+	try {
+		res.clearCookie('sessionId');
+		// additional session data clearing code here if needed
+		req.session.destroy(); // destroy the session
+		res.sendStatus(200);
+	} catch (error) {
+		console.error('Error clearing session data:', error);
+		res.sendStatus(500);
+	}
+});
+
+app.get('/', (req, res) => {
+	res.send('Server is running');
+});
+
+app.get('/api/items/nextId', (req, res) => {
+	const sql =
+		'SELECT AUTO_INCREMENT AS nextId FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?';
+
+	const params = ['loginsystem', 'items'];
+	db.query(sql, params, (err, result) => {
+		if (err) {
+			console.log(err);
+			res.status(500).send('Error fetching next ID');
+			return;
+		}
+
+		// Convert the result to an array
+		const nextId = Array.from(result, (row) => row.nextId);
+
+		res.send(nextId);
+	});
+});
+
+app.post('/api/items', (req, res) => {
+	if (!req.session.user) {
+		res.status(401).send('User not authenticated');
+		return;
+	}
+
+	const username = req.session.user.username;
+	console.log(`User ${username} is attempting to add an item`);
+	const today = new Date().toISOString().slice(0, 10);
+
+	db.execute(
+		'SELECT COUNT(*) as itemCount FROM items WHERE username = ? AND DATE(post_date) = ?',
+		[username, today],
+		(err, result) => {
+			if (err) {
+				console.error(err);
+				res.status(500).send('Internal Server Error');
+				return;
+			}
+
+			 const count = result[0].itemCount;
+				if (count >= 3) {
+					res
+						.status(429)
+						.json({ message: 'You can only add up to 3 items per day.' });
+					return;
+				}
+
+			if (result[0].itemCount >= 3) {
+				res.status(400).send('You can only add 3 items per day');
+				return;
+			}
+
+			const newItem = req.body;
+			const title = newItem.title;
+			const description = newItem.description || null;
+			const category = newItem.category || null;
+			const price = newItem.price || null;
+
+			db.execute(
+				'INSERT INTO items (username, title, description, category, price) VALUES (?, ?, ?, ?, ?)',
+				[username, title, description, category, price],
+				(err, result) => {
+					if (err) {
+						console.error(err);
+						res.status(500).send('Internal Server Error');
+					} else {
+						console.log(result);
+						const savedItem = {
+							id: result.insertId,
+							title,
+							description,
+							category,
+							price,
+							post_date: new Date().toISOString(),
+						};
+						res.status(201).json(savedItem);
+					}
+				}
+			);
+		}
+	);
+});
+
+
+app.get('/api/items', (req, res) => {
+	const postDate = req.query.post_date;
+
+	const sql = 'SELECT * FROM items WHERE post_date = ?';
+	const params = [postDate];
+
+	db.query(sql, params, (err, result) => {
+		if (err) {
+			console.log(err);
+			res.status(500).send('Error fetching items');
+			return;
+		}
+
+		res.send(result);
+	});
+});
+

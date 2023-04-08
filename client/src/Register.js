@@ -1,6 +1,8 @@
 import Axios from 'axios';
 import bcrypt from 'bcryptjs'; //for hasing passwords
 import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { navigate } from '@reach/router';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -37,6 +39,15 @@ function Register() {
 		return re.test(email);
 	};
 
+	const navigate = useNavigate();
+
+		useEffect(() => {
+			const isLoggedIn = localStorage.getItem('isLoggedIn');
+			if (isLoggedIn) {
+				navigate('/dashboard');
+			}
+		}, [navigate]);
+
 	useEffect(() => {
 		setPasswordMatch(passwordReg === confirmPassword);
 
@@ -49,7 +60,13 @@ function Register() {
 		} else {
 			setShowPasswordError(false);
 		}
-	}, [passwordReg, confirmPassword]);
+	}, [ passwordReg, confirmPassword ] );
+	
+
+
+
+
+
 
 	const register = () => {
 		if (

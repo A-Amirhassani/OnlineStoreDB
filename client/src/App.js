@@ -2,21 +2,30 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import Login from './Login';
 import Register from './Register';
-import Logout from './Logout';
+import AddItemForm from './AddItemForm';
+import Dashboard from './Dashboard';
 
 function App() {
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isAuthenticated, setIsAuthenticated] = useState(
+		localStorage.getItem('isLoggedIn') === 'true'
+	);
 
 	return (
 		<BrowserRouter>
 			<Routes>
+				
 				<Route path="/" element={<Navigate to="/login" />} />
 				<Route
 					path="/login"
 					element={<Login setIsAuthenticated={setIsAuthenticated} />}
 				/>
 				<Route path="/register" element={<Register />} />
-				<Route path="/logout" element={<Logout />} />
+				{isAuthenticated ? (
+					<Route path="/dashboard" element={<Dashboard />} />
+				) : null}
+
+				<Route path="/add-item" element={<AddItemForm />} />
+				<Route path="*" element={<Navigate to="/login" />} />
 			</Routes>
 		</BrowserRouter>
 	);
