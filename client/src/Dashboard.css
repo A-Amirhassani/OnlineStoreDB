@@ -1,0 +1,30 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  max-width: 600px;
+  margin: 40px auto;
+}
+
+.dashboard h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #37474f;
+}
+
+.dashboard button {
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-right: 10px;
+}
+
+.dashboard button:hover {
+  background-color: #1976d2;
+}

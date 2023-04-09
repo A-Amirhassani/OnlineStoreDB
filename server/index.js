@@ -248,19 +248,26 @@ app.post('/api/items', (req, res) => {
 
 
 app.get('/api/items', (req, res) => {
-	const postDate = req.query.post_date;
-
-	const sql = 'SELECT * FROM items WHERE post_date = ?';
-	const params = [postDate];
-
-	db.query(sql, params, (err, result) => {
+	db.execute('SELECT * FROM loginsystem.items', (err, result) => {
 		if (err) {
-			console.log(err);
-			res.status(500).send('Error fetching items');
-			return;
+			console.error(err);
+			return res.status(500).json({ error: err });
 		}
 
-		res.send(result);
+		console.log(result);
+
+		for (var i = 0; i < result.length; i++) {
+			tuple = JSON.stringify(result[i]);
+			obj = JSON.parse(tuple);
+
+			// console.log('Username: ' + obj.username);
+			// console.log('Title: ' + obj.title);
+			// console.log('Description: ' + obj.description);
+			// console.log('Price: ' + obj.price);
+			// console.log(' ');
+		}
+
+		return res.json(result);
 	});
 });
 

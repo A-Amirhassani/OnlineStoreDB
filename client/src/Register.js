@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { navigate } from '@reach/router';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './Register.css';
 
 function Register() {
 	const [usernameReg, setUernameReg] = useState('');
