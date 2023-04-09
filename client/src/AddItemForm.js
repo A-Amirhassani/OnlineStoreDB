@@ -53,7 +53,7 @@ function AddItemForm() {
 			});
 	};
 	const handleDashboard = () => {
-		navigate('/add-item');
+		navigate('/Dashboard');
 	};
 	return (
 		<div className="add-item-form">

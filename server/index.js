@@ -193,22 +193,23 @@ app.post('/api/items', (req, res) => {
 	const today = new Date().toISOString().slice(0, 10);
 
 	db.execute(
-		'SELECT COUNT(*) as itemCount FROM items WHERE username = ? AND DATE(post_date) = ?',
-		[username, today],
+		'SELECT COUNT(id) as itemCount FROM items WHERE username = ? and cast(items.post_date as date) = cast(current_date() as date)',
+		[username],
 		(err, result) => {
 			if (err) {
 				console.error(err);
 				res.status(500).send('Internal Server Error');
 				return;
 			}
+			console.log(result);
 
-			 const count = result[0].itemCount;
-				if (count >= 3) {
-					res
-						.status(429)
-						.json({ message: 'You can only add up to 3 items per day.' });
-					return;
-				}
+			const count = result[0].itemCount;
+			if (count >= 3) {
+				res
+					.status(429)
+					.json({ message: 'You can only add up to 3 items per day.' });
+				return;
+			}
 
 			if (result[0].itemCount >= 3) {
 				res.status(400).send('You can only add 3 items per day');
