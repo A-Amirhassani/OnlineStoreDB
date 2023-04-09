@@ -193,22 +193,23 @@ app.post('/api/items', (req, res) => {
 	const today = new Date().toISOString().slice(0, 10);
 
 	db.execute(
-		'SELECT COUNT(*) as itemCount FROM items WHERE username = ? AND DATE(post_date) = ?',
-		[username, today],
+		'SELECT COUNT(id) as itemCount FROM items WHERE username = ? and cast(items.post_date as date) = cast(current_date() as date)',
+		[username],
 		(err, result) => {
 			if (err) {
 				console.error(err);
 				res.status(500).send('Internal Server Error');
 				return;
 			}
+			console.log(result);
 
-			 const count = result[0].itemCount;
-				if (count >= 3) {
-					res
-						.status(429)
-						.json({ message: 'You can only add up to 3 items per day.' });
-					return;
-				}
+			const count = result[0].itemCount;
+			if (count >= 3) {
+				res
+					.status(429)
+					.json({ message: 'You can only add up to 3 items per day.' });
+				return;
+			}
 
 			if (result[0].itemCount >= 3) {
 				res.status(400).send('You can only add 3 items per day');
@@ -248,19 +249,29 @@ app.post('/api/items', (req, res) => {
 
 
 app.get('/api/items', (req, res) => {
-	const postDate = req.query.post_date;
-
-	const sql = 'SELECT * FROM items WHERE post_date = ?';
-	const params = [postDate];
-
-	db.query(sql, params, (err, result) => {
+	db.execute('SELECT * FROM loginsystem.items', (err, result) => {
 		if (err) {
-			console.log(err);
-			res.status(500).send('Error fetching items');
-			return;
+			console.error(err);
+			return res.status(500).json({ error: err });
 		}
 
-		res.send(result);
+		// console.log(result); // Comment out or remove this line
+
+		for (var i = 0; i < result.length; i++) {
+			tuple = JSON.stringify(result[i]);
+			obj = JSON.parse(tuple);
+
+			// Comment out or remove the following lines
+			// console.log('Username: ' + obj.username);
+			// console.log('Title: ' + obj.title);
+			// console.log('Description: ' + obj.description);
+			// console.log('Price: ' + obj.price);
+			// console.log(' ');
+		}
+
+		return res.json(result);
 	});
 });
+
+
 

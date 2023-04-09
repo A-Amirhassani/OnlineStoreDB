@@ -1,11 +1,10 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import Logout from './Logout';
+import './AddItemForm.css';
 
 const API_URL = 'http://localhost:3001/api/items';
 
@@ -14,7 +13,12 @@ function AddItemForm() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [category, setCategory] = useState('');
-	const [price, setPrice] = useState('');
+	const [ price, setPrice ] = useState( '' );
+	
+	const allFieldsFilled = () => {
+		return title && description && category && price;
+	};
+
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -48,9 +52,14 @@ function AddItemForm() {
 				}
 			});
 	};
+	const handleDashboard = () => {
+		navigate('/Dashboard');
+	};
 	return (
-		<div>
+		<div className="add-item-form">
 			<ToastContainer />
+			<button onClick={handleDashboard}>Dashboard</button>
+			<Logout />
 			<h2>Add Item Form</h2>
 			<form onSubmit={handleSubmit}>
 				<div>
@@ -82,13 +91,16 @@ function AddItemForm() {
 				<div>
 					<label htmlFor="price">Price:</label>
 					<input
-						type="text"
+						type="number"
 						id="price"
 						value={price}
 						onChange={(event) => setPrice(event.target.value)}
+						step="0.01"
 					/>
 				</div>
-				<button type="submit">Submit</button>
+				<button type="submit" disabled={!allFieldsFilled()}>
+					Submit
+				</button>
 			</form>
 		</div>
 	);
