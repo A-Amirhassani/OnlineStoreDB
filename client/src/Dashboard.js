@@ -4,13 +4,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Logout from './Logout';
 import './Dashboard.css';
+import ReviewForm from './ReviewForm';
+
 
 function Dashboard() {
 	const navigate = useNavigate();
 	const navigateRef = useRef( navigate );
 	const [ items, setItems ] = useState( [] );
 	const [ searchTerm, setSearchTerm ] = useState( '' );
-	const [searched, setSearched] = useState(false);
+	const [ searched, setSearched ] = useState( false );
+	const [ selectedItem, setSelectedItem ] = useState( null );
+	const [activeDropdownItem, setActiveDropdownItem] = useState(null);
+
 	
 	const handleSearchChange = (event) => {
 		setSearchTerm(event.target.value);
@@ -70,6 +75,21 @@ function Dashboard() {
 	const handleAddItem = () => {
 		navigate('/add-item');
 	};
+	 const handleItemSelected = (item) => {
+			setSelectedItem(item);
+	};
+	
+	function DropdownContent({ show, item, onCancel }) {
+		if (!show) {
+			return null;
+		}
+
+		return (
+			<div className="dropdown-content">
+				<ReviewForm item={item} onCancel={onCancel} />
+			</div>
+		);
+	}
 
 	return (
 		<div>
@@ -94,6 +114,7 @@ function Dashboard() {
 								<th>Description</th>
 								<th>Category</th>
 								<th>Price</th>
+								<th>Write Review</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -103,6 +124,22 @@ function Dashboard() {
 									<td>{item.description}</td>
 									<td>{item.category}</td>
 									<td>${item.price}</td>
+									<td>
+										<button
+											onClick={(e) => {
+												e.stopPropagation();
+												activeDropdownItem === item.id
+													? setActiveDropdownItem(null)
+													: setActiveDropdownItem(item.id);
+											}}>
+											Write Review
+										</button>
+										<DropdownContent
+											show={activeDropdownItem === item.id}
+											item={item}
+											onCancel={() => setActiveDropdownItem(null)}
+										/>
+									</td>
 								</tr>
 							))}
 						</tbody>
@@ -111,6 +148,12 @@ function Dashboard() {
 					<p>No items found</p>
 				)
 			) : null}
+			{selectedItem && (
+				<ReviewForm
+					item={selectedItem}
+					onCancel={() => setSelectedItem(null)}
+				/>
+			)}
 		</div>
 	);
 

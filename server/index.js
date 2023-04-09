@@ -1,7 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
+const bcrypt = require( 'bcrypt' );
+const reviewsRoute = require('./routes/reviews'); 
 
 const app = express();
 const session = require('express-session');
@@ -27,6 +28,8 @@ app.use(
 		},
 	})
 );
+
+app.use('/api/reviews', reviewsRoute);
 
 const db = mysql.createConnection({
 	user: 'root',
