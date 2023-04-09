@@ -53,7 +53,7 @@ function Dashboard() {
 					<div key={index}>
 						<h3>{item.title}</h3>
 						<p>{item.description}</p>
-						{/* Add other properties you want to display */}
+						
 					</div>
 				))}
 			</div>
