@@ -254,12 +254,13 @@ app.get('/api/items', (req, res) => {
 			return res.status(500).json({ error: err });
 		}
 
-		console.log(result);
+		// console.log(result); // Comment out or remove this line
 
 		for (var i = 0; i < result.length; i++) {
 			tuple = JSON.stringify(result[i]);
 			obj = JSON.parse(tuple);
 
+			// Comment out or remove the following lines
 			// console.log('Username: ' + obj.username);
 			// console.log('Title: ' + obj.title);
 			// console.log('Description: ' + obj.description);
@@ -270,4 +271,5 @@ app.get('/api/items', (req, res) => {
 		return res.json(result);
 	});
 });
+
 
