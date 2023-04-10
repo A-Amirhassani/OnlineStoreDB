@@ -41,16 +41,18 @@ function AddItemForm() {
 			})
 			.catch((error) => {
 				console.log(error);
+				console.log(error.response); // Add this line
 				if (error.response && error.response.status === 429) {
 					// Display the message received from the server
 					toast.error(error.response.data.message);
 				} else {
 					// Handle other errors as usual
 					toast.error(
-						'Sorry, You are not allowed to post more than 3 items per day..'
+						'Sorry, an error occurred while trying to add your item.'
 					);
 				}
 			});
+
 	};
 	const handleDashboard = () => {
 		navigate('/Dashboard');

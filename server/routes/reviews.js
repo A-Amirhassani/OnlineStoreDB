@@ -6,6 +6,18 @@ const db = require('../config/db'); // Update this with the path to your databas
 router.post('/', async (req, res) => {
 	const { item_id, rating, description, username } = req.body;
 
+	// Check if the user is the owner of the item
+	const itemOwnerQuery = `
+        SELECT owner_username FROM items
+        WHERE id = ?
+    `;
+
+	const [[itemOwnerResult]] = await db.query(itemOwnerQuery, [item_id]);
+
+	if (itemOwnerResult.owner_username === username) {
+		return res.status(400).send('You cannot write a review for your own item.');
+	}
+
 	// Check if the user has already submitted 3 reviews in a day
 	const reviewCountQuery = `
     SELECT COUNT(*) as review_count

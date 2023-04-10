@@ -2,28 +2,25 @@ import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import Logout from './Logout';
 import './Dashboard.css';
+import Logout from './Logout';
 import ReviewForm from './ReviewForm';
-
 
 function Dashboard() {
 	const navigate = useNavigate();
-	const navigateRef = useRef( navigate );
-	const [ items, setItems ] = useState( [] );
-	const [ searchTerm, setSearchTerm ] = useState( '' );
-	const [ searched, setSearched ] = useState( false );
-	const [ selectedItem, setSelectedItem ] = useState( null );
-	const [activeDropdownItem, setActiveDropdownItem] = useState(null);
+	const navigateRef = useRef(navigate);
+	const [items, setItems] = useState([]);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [searched, setSearched] = useState(false);
+	const [selectedItem, setSelectedItem] = useState(null);
 
-	
 	const handleSearchChange = (event) => {
 		setSearchTerm(event.target.value);
 	};
 
 	const handleSearchSubmit = (event) => {
 		event.preventDefault();
-		filterItems( searchTerm );
+		filterItems(searchTerm);
 		setSearched(true);
 	};
 
@@ -40,7 +37,6 @@ function Dashboard() {
 				console.log('Error');
 			});
 	};
-
 
 	useEffect(() => {
 		const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -60,7 +56,7 @@ function Dashboard() {
 		axios
 			.get('http://localhost:3001/api/items')
 			.then((res) => {
-				console.log( res.data );
+				console.log(res.data);
 				setItems(res.data);
 			})
 			.catch((error) => {
@@ -75,10 +71,14 @@ function Dashboard() {
 	const handleAddItem = () => {
 		navigate('/add-item');
 	};
-	 const handleItemSelected = (item) => {
+	const handleItemSelected = (item) => {
+		if (item.owner_username === localStorage.getItem('username')) {
+			toast.error("You can't write a review for your own item.");
+		} else {
 			setSelectedItem(item);
+		}
 	};
-	
+
 	function DropdownContent({ show, item, onCancel }) {
 		if (!show) {
 			return null;
@@ -128,16 +128,14 @@ function Dashboard() {
 										<button
 											onClick={(e) => {
 												e.stopPropagation();
-												activeDropdownItem === item.id
-													? setActiveDropdownItem(null)
-													: setActiveDropdownItem(item.id);
+												handleItemSelected(item);
 											}}>
 											Write Review
 										</button>
 										<DropdownContent
-											show={activeDropdownItem === item.id}
+											show={selectedItem === item}
 											item={item}
-											onCancel={() => setActiveDropdownItem(null)}
+											onCancel={() => setSelectedItem(null)}
 										/>
 									</td>
 								</tr>
@@ -148,15 +146,8 @@ function Dashboard() {
 					<p>No items found</p>
 				)
 			) : null}
-			{selectedItem && (
-				<ReviewForm
-					item={selectedItem}
-					onCancel={() => setSelectedItem(null)}
-				/>
-			)}
 		</div>
 	);
-
 }
 
 export default Dashboard;

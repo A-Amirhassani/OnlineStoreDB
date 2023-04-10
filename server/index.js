@@ -1,13 +1,12 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const bcrypt = require( 'bcrypt' );
-const reviewsRoute = require('./routes/reviews'); 
+const bcrypt = require('bcrypt');
+const reviewsRoute = require('./routes/reviews');
 
 const app = express();
 const session = require('express-session');
 
-// app.use(cors());
 app.use(
 	cors({
 		origin: ['http://localhost:3000'],
@@ -83,6 +82,7 @@ app.post('/login', (req, res) => {
 					} else if (result) {
 						// Store user object in session
 						req.session.user = user;
+						console.log('User object stored in session:', req.session.user); // Add this line
 						res.send(user);
 					} else {
 						res
@@ -96,6 +96,7 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/me', (req, res) => {
+	console.log('Session:', req.session);
 	if (req.session.user) {
 		res.send(req.session.user);
 	} else {
@@ -186,17 +187,21 @@ app.get('/api/items/nextId', (req, res) => {
 });
 
 app.post('/api/items', (req, res) => {
+	console.log('Received request to /api/items');
+
 	if (!req.session.user) {
+		console.log('User not authenticated');
 		res.status(401).send('User not authenticated');
 		return;
 	}
 
 	const username = req.session.user.username;
 	console.log(`User ${username} is attempting to add an item`);
+	console.log(`User ${username} is attempting to add an item`);
 	const today = new Date().toISOString().slice(0, 10);
 
 	db.execute(
-		'SELECT COUNT(id) as itemCount FROM items WHERE username = ? and cast(items.post_date as date) = cast(current_date() as date)',
+		'SELECT COUNT(id) as itemCount FROM items WHERE owner_username = ? and cast(items.post_date as date) = cast(current_date() as date)',
 		[username],
 		(err, result) => {
 			if (err) {
@@ -207,15 +212,11 @@ app.post('/api/items', (req, res) => {
 			console.log(result);
 
 			const count = result[0].itemCount;
+			console.log(`Item count for ${username} today: ${count}`);
 			if (count >= 3) {
 				res
 					.status(429)
 					.json({ message: 'You can only add up to 3 items per day.' });
-				return;
-			}
-
-			if (result[0].itemCount >= 3) {
-				res.status(400).send('You can only add 3 items per day');
 				return;
 			}
 
@@ -225,8 +226,17 @@ app.post('/api/items', (req, res) => {
 			const category = newItem.category || null;
 			const price = newItem.price || null;
 
+			console.log('Inserting:', {
+				owner_username: username,
+				title,
+				description,
+				category,
+				price,
+			});
+			// Update this line
+
 			db.execute(
-				'INSERT INTO items (username, title, description, category, price) VALUES (?, ?, ?, ?, ?)',
+				'INSERT INTO items (owner_username, title, description, category, price) VALUES (?, ?, ?, ?, ?)',
 				[username, title, description, category, price],
 				(err, result) => {
 					if (err) {
@@ -249,7 +259,6 @@ app.post('/api/items', (req, res) => {
 		}
 	);
 });
-
 
 app.get('/api/items', (req, res) => {
 	db.execute('SELECT * FROM loginsystem.items', (err, result) => {
@@ -275,6 +284,3 @@ app.get('/api/items', (req, res) => {
 		return res.json(result);
 	});
 });
-
-
-
