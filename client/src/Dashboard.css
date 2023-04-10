@@ -40,3 +40,32 @@ button[type="submit"] {
 button[type="submit"]:hover {
   background-color: #3e8e41;
 }
+
+.selected {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+.review-form {
+  margin-top: 20px;
+}
+
+.review-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.review-form textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.review-list {
+  margin-top: 20px;
+}
+
+.review-list li {
+  margin-bottom: 10px;
+}
