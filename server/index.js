@@ -7,6 +7,8 @@ const reviewsRoute = require('./routes/reviews');
 const app = express();
 const session = require('express-session');
 
+const itemsRouter = require('./routes/items');
+
 app.use(
 	cors({
 		origin: ['http://localhost:3000'],
@@ -27,7 +29,7 @@ app.use(
 		},
 	})
 );
-
+app.use('/api/items', itemsRouter);
 app.use('/api/reviews', reviewsRoute);
 
 const db = mysql.createConnection({
@@ -45,12 +47,37 @@ app.listen(3001, () => {
 	console.log('running server');
 });
 
+const insertItemCategories = async (req, res, db) => {
+	const { item_id, categories } = req.body;
+
+	if (!Array.isArray(categories) || !item_id) {
+		res.status(400).send('Invalid request data');
+		return;
+	}
+
+	try {
+		for (const category of categories) {
+			await db
+				.promise()
+				.execute(
+					'INSERT INTO item_categories (category, item_id) VALUES (?, ?)',
+					[category, item_id]
+				);
+		}
+		res.status(201).send('Categories added successfully');
+	} catch (err) {
+		console.error(err);
+		res.status(500).send('Error inserting categories');
+	}
+};
+
 app.post('/register', (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
 	const firstName = req.body.firstName;
 	const lastName = req.body.lastName;
 	const email = req.body.email;
+
 	db.execute(
 		'INSERT INTO users (username, password, firstName, lastName, email) VALUES (?,?,?,?,?)',
 		[username, password, firstName, lastName, email],
@@ -260,27 +287,52 @@ app.post('/api/items', (req, res) => {
 	);
 });
 
+
 app.get('/api/items', (req, res) => {
-	db.execute('SELECT * FROM loginsystem.items', (err, result) => {
+	const sql = `SELECT items.id, items.owner_username, items.title, items.description, items.price, 
+       GROUP_CONCAT(item_categories.category) as categories
+       FROM loginsystem.items 
+       LEFT JOIN loginsystem.item_categories ON items.id = item_categories.item_id
+       GROUP BY items.id`;
+
+
+	db.query(sql, (err, result) => {
 		if (err) {
 			console.error(err);
 			return res.status(500).json({ error: err });
 		}
 
-		// console.log(result); // Comment out or remove this line
-
-		for (var i = 0; i < result.length; i++) {
-			tuple = JSON.stringify(result[i]);
-			obj = JSON.parse(tuple);
-
-			// Comment out or remove the following lines
-			// console.log('Username: ' + obj.username);
-			// console.log('Title: ' + obj.title);
-			// console.log('Description: ' + obj.description);
-			// console.log('Price: ' + obj.price);
-			// console.log(' ');
-		}
-
+		console.log('Items:', result); // Log the result
 		return res.json(result);
 	});
 });
+
+
+
+app.get('/api/items/search', async (req, res) => {
+	const { category } = req.query;
+
+	try {
+		let items;
+		if (category) {
+			items = await Item.find({ categories: category });
+		} else {
+			items = await Item.find({});
+		}
+		res.send(items);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send('Error fetching items');
+	}
+});
+
+app.post('/api/item-categories', (req, res) =>
+	insertItemCategories(req, res, db)
+);
+
+
+
+
+
+
+

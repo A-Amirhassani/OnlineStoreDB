@@ -20,40 +20,53 @@ function AddItemForm() {
 	};
 
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
+const handleSubmit = (event) => {
+	event.preventDefault();
 
-		const now = new Date();
-		const today = now.toISOString().substring(0, 10);
+	const now = new Date();
+	const today = now.toISOString().substring(0, 10);
 
-		const newItem = {
-			title,
-			description,
-			category,
-			price,
-			post_date: today,
-		};
-
-		axios
-			.post(API_URL, newItem, { withCredentials: true })
-			.then((response) => {
-				navigate('/dashboard');
-			})
-			.catch((error) => {
-				console.log(error);
-				console.log(error.response); // Add this line
-				if (error.response && error.response.status === 429) {
-					// Display the message received from the server
-					toast.error(error.response.data.message);
-				} else {
-					// Handle other errors as usual
-					toast.error(
-						'Sorry, an error occurred while trying to add your item.'
-					);
-				}
-			});
-
+	const newItem = {
+		title,
+		description,
+		category,
+		price,
+		post_date: today,
 	};
+
+	axios
+		.post(API_URL, newItem, { withCredentials: true })
+		.then((response) => {
+			const item_id = response.data.id;
+			const categoriesArray = category.split(',').map((cat) => cat.trim());
+
+			axios
+				.post(
+					'http://localhost:3001/api/item-categories',
+					{ item_id, categories: categoriesArray },
+					{ withCredentials: true }
+				)
+				.then(() => {
+					navigate('/dashboard');
+				})
+				.catch((error) => {
+					console.log(error);
+					toast.error(
+						'Sorry, an error occurred while trying to add categories for your item.'
+					);
+				});
+		})
+		.catch((error) => {
+			console.log(error);
+			console.log(error.response);
+			if (error.response && error.response.status === 429) {
+				toast.error(error.response.data.message);
+			} else {
+				toast.error('Sorry, an error occurred while trying to add your item.');
+			}
+		});
+};
+
 	const handleDashboard = () => {
 		navigate('/Dashboard');
 	};

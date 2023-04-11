@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Dashboard.css';
@@ -14,6 +14,9 @@ function Dashboard() {
 	const [searched, setSearched] = useState(false);
 	const [selectedItem, setSelectedItem] = useState(null);
 
+
+
+
 	const handleSearchChange = (event) => {
 		setSearchTerm(event.target.value);
 	};
@@ -24,19 +27,32 @@ function Dashboard() {
 		setSearched(true);
 	};
 
-	const filterItems = (searchTerm) => {
-		axios
-			.get('http://localhost:3001/api/items')
-			.then((res) => {
-				const filteredItems = res.data.filter((item) =>
-					item.category.toLowerCase().includes(searchTerm.toLowerCase())
-				);
-				setItems(filteredItems);
-			})
-			.catch((error) => {
-				console.log('Error');
+
+const filterItems = useCallback((searchTerm) => {
+	let url = 'http://localhost:3001/api/items';
+	if (searchTerm) {
+		url = `http://localhost:3001/api/items/search?category=${searchTerm}`;
+	}
+	axios
+		.get(url)
+		.then((res) => {
+			const items = res.data.map((item) => {
+				if (item.category && !item.categories) {
+					return { ...item, categories: item.category };
+				} else {
+					return item;
+				}
 			});
-	};
+			setItems(items);
+		})
+		.catch((error) => {
+			console.log('Error');
+		});
+}, []);
+
+
+
+
 
 	useEffect(() => {
 		const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -53,20 +69,17 @@ function Dashboard() {
 
 		window.addEventListener('popstate', handleBackButton);
 
-		axios
-			.get('http://localhost:3001/api/items')
-			.then((res) => {
-				console.log(res.data);
-				setItems(res.data);
-			})
-			.catch((error) => {
-				console.log('Error');
-			});
 
 		return () => {
 			window.removeEventListener('popstate', handleBackButton);
 		};
-	}, []);
+	}, [] );
+	
+	useEffect(() => {
+		filterItems('');
+	}, [filterItems]);
+
+
 
 	const handleAddItem = () => {
 		navigate('/add-item');
@@ -122,7 +135,7 @@ function Dashboard() {
 								<tr key={index}>
 									<td>{item.title}</td>
 									<td>{item.description}</td>
-									<td>{item.category}</td>
+									<td>{item.categories}</td>
 									<td>${item.price}</td>
 									<td>
 										<button
