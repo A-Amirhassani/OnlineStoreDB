@@ -301,7 +301,6 @@ app.get('/api/items', (req, res) => {
 			console.error(err);
 			return res.status(500).json({ error: err });
 		}
-
 		console.log('Items:', result); // Log the result
 		return res.json(result);
 	});
@@ -330,9 +329,124 @@ app.post('/api/item-categories', (req, res) =>
 	insertItemCategories(req, res, db)
 );
 
+//Phase 3 number 2
+app.get('/sameDayItems', (req, res) => {
+	//categ1 should be set to the first category the user inputs
+	const categ1 = 'gaming';
+	//categ2 should be set to the second category the user inputs
+	const categ2 = 'office';
 
+	//add % needed for sql to work properly
+	const category1 = "%" + categ1 + "%"
+	const category2 = "%" + categ2 + "%"
 
+	const sql = 
+				`select distinct a.owner_username 
+				from loginsystem.items a, loginsystem.items b
+				where a.category like ?
+				and b.category like ?
+				AND cast(a.post_date as date) = cast(b.post_date as date)
+				and a.owner_username = b.owner_username
+				and a.id != b.id
+				`
+	const params = [category1, category2];
+	db.execute(sql,params,(err, result) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).json({ error: err });
+		}
+		console.log('#2 Result', result); // Log the result
+		return res.json(result);
+	});
+});
 
+//phase 3 number 3
+app.get('/allGoodExcellentReviews', (req, res) => {
+	//categ1 should be set to the first category the user inputs
+	const vendorUsername = 'jaimetorrico'
 
+	const sql = 
+				`select distinct itemID, title
+				from (
+					SELECT i.id as itemID, i.title, i.owner_username as vendor, r.username as buyer, r.rating
+					FROM items i JOIN reviews r
+					ON i.id = r.item_id
+					where i.owner_username = ?) as joinedReviews
+				
+				where joinedReviews.itemID NOT IN
+					(select i.id as itemID
+					from items i JOIN reviews r
+					on i.id = r.item_id
+					where r.rating in ('fair', 'poor'))
+				`
+	const params = [vendorUsername];
+	db.execute(sql,params,(err, result) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).json({ error: err });
+		}
+		console.log('#2 Result', result); // Log the result
+		return res.json(result);
+	});
+});
 
+//phase 3 number 4
+app.get('/mostItemsPosted', (req, res) => {
+	//categ1 should be set to the first category the user inputs
+	const vendorUsername = 'jaimetorrico'
+
+	const sql = 
+				`select owner_username as vendors
+				from (
+					select owner_username, count(*) as count
+						from loginsystem.items
+						group by owner_username
+					) as topVendors
+				where topVendors.count = (
+					select max(count)
+						from (
+							select owner_username, count(*) as count
+							from loginsystem.items
+							group by owner_username
+						) as itemsCount
+				)`
+	const params = [vendorUsername];
+	db.execute(sql,params,(err, result) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).json({ error: err });
+		}
+		console.log('#2 Result', result); // Log the result
+		return res.json(result);
+	});
+});
+
+//phase 3 number 5
+app.get('/favoritedByXAndY', (req, res) => {//users returned are favorited by both userX and userY
+	//userX should be the first user choose by the user
+	const userX = 'david'
+	//UserY should be the second user choose by the user
+	const userY = 'Jimmy'
+
+	const sql = 
+				`select buyer1Favs.seller
+				from
+					(select seller 
+					from favorite_users
+					where buyer = ?) as buyer1Favs
+				join 
+					(select seller 
+					from favorite_users
+					where buyer = ?) as buyer2Favs
+				on buyer1Favs.seller = buyer2Favs.seller `
+	const params = [userX, userY];
+	db.execute(sql,params,(err, result) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).json({ error: err });
+		}
+		console.log('#2 Result', result); // Log the result
+		return res.json(result);
+	});
+});
 
