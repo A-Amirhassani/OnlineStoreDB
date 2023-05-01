@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './CloseButton.css';
 
 function Option5() {
 	const [users, setUsers] = useState([]);
@@ -31,6 +32,10 @@ function Option5() {
 		} catch (error) {
 			console.error(error);
 		}
+	};
+
+	const handleCloseResults = () => {
+		setVisible(false);
 	};
 
 	return (
@@ -67,6 +72,9 @@ function Option5() {
 			</button>
 			{visible && (
 				<div>
+					<button className="close-button" onClick={handleCloseResults}>
+						X
+					</button>
 					<table>
 						<thead>
 							<tr>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './CloseButton.css';
 
 function Option4() {
 	const [results, setResults] = useState([]);
@@ -23,12 +24,17 @@ function Option4() {
 
 	return (
 		<div>
+			<h3>
+				4.Users with most posts since 5/1/2020 (inclusive) with tie-break.
+			</h3>
 			<button onClick={getTopUsersSinceDate}>
-				4.List Users with Most Items Posted Since 5/1/2020
+				List Users with Most Items Posted Since 5/1/2020
 			</button>
 			{visible && (
 				<div>
-					<button onClick={handleClose}>X</button>
+					<button className="close-button" onClick={handleClose}>
+						X
+					</button>
 					<table>
 						<thead>
 							<tr>

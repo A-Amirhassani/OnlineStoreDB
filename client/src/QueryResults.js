@@ -16,16 +16,36 @@ import './QueryResults.css';
 function QueryResults() {
 	return (
 		<div>
-			<Option1 />
-			<Option2 />
-			<Option3 />
-			<Option4 />
-			<Option5 />
-			<Option6 />
-			<Option7 />
-			<Option8 />
-			<Option9 />
-			<Option10 />
+			<div className="option-container">
+				<Option1 />
+			</div>
+			<div className="option-container">
+				<Option2 />
+			</div>
+			<div className="option-container">
+				<Option3 />
+			</div>
+			<div className="option-container">
+				<Option4 />
+			</div>
+			<div className="option-container">
+				<Option5 />
+			</div>
+			<div className="option-container">
+				<Option6 />
+			</div>
+			<div className="option-container">
+				<Option7 />
+			</div>
+			<div className="option-container">
+				<Option8 />
+			</div>
+			<div className="option-container">
+				<Option9 />
+			</div>
+			<div className="option-container">
+				<Option10 />
+			</div>
 			{/* Render other options here */}
 		</div>
 	);

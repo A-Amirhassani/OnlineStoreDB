@@ -1,0 +1,23 @@
+/* CloseButton.css */
+
+.close-button {
+	background-color: #f44336;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	width: 35px;
+	height: 30px;
+	line-height: 15px; /* Adjust this line */
+	font-weight: bold; /* Add this line */
+	position: absolute;
+	right: 10px;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.close-button:hover {
+	background-color: #d32f2f;
+}
