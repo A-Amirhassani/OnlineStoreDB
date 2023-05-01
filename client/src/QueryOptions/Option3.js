@@ -53,7 +53,7 @@ function Option3() {
 			{showResults && (
 				<div>
 					<button className="close-button" onClick={handleCloseResults}>
-						X
+						
 					</button>
 					<table className="results-table">
 						<thead>

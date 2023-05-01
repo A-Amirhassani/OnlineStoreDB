@@ -73,7 +73,7 @@ function Option5() {
 			{visible && (
 				<div>
 					<button className="close-button" onClick={handleCloseResults}>
-						X
+						
 					</button>
 					<table>
 						<thead>

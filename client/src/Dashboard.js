@@ -13,7 +13,9 @@ function Dashboard() {
 	const [items, setItems] = useState([]);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searched, setSearched] = useState(false);
-	const [selectedItem, setSelectedItem] = useState(null);
+	const [ selectedItem, setSelectedItem ] = useState( null );
+	const [showSearchResults, setShowSearchResults] = useState(true);
+
 
 
 
@@ -25,8 +27,15 @@ function Dashboard() {
 	const handleSearchSubmit = (event) => {
 		event.preventDefault();
 		filterItems(searchTerm);
-		setSearched(true);
+		setSearched( true );
+		setShowSearchResults(true);
 	};
+
+	const handleClose = () => {
+		setSearched(false);
+	};
+
+
 
 
 const filterItems = useCallback((searchTerm) => {
@@ -120,9 +129,14 @@ const filterItems = useCallback((searchTerm) => {
 					onChange={handleSearchChange}
 				/>
 				<button type="submit">Search</button>
-				
 			</form>
-			
+
+			{searched && showSearchResults && (
+				<button className="close-button" onClick={handleClose}>
+					
+				</button>
+			)}
+
 			{searched ? (
 				items.length > 0 ? (
 					<table>
@@ -164,7 +178,7 @@ const filterItems = useCallback((searchTerm) => {
 					<p>No items found</p>
 				)
 			) : null}
-			{ <QueryResults /> }
+			{<QueryResults />}
 		</div>
 	);
 }

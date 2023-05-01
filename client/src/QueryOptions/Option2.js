@@ -32,7 +32,7 @@ function Option2() {
 		return (
 			<div>
 				<button className="close-button" onClick={handleCloseResults}>
-					X
+					
 				</button>
 				<table>
 					<thead>
