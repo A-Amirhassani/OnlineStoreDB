@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import './Dashboard.css';
 import Logout from './Logout';
 import ReviewForm from './ReviewForm';
+import QueryResults from './QueryResults';
 
 function Dashboard() {
 	const navigate = useNavigate();
@@ -92,6 +93,8 @@ const filterItems = useCallback((searchTerm) => {
 		}
 	};
 
+	
+
 	function DropdownContent({ show, item, onCancel }) {
 		if (!show) {
 			return null;
@@ -117,7 +120,9 @@ const filterItems = useCallback((searchTerm) => {
 					onChange={handleSearchChange}
 				/>
 				<button type="submit">Search</button>
+				
 			</form>
+			
 			{searched ? (
 				items.length > 0 ? (
 					<table>
@@ -159,6 +164,7 @@ const filterItems = useCallback((searchTerm) => {
 					<p>No items found</p>
 				)
 			) : null}
+			{ <QueryResults /> }
 		</div>
 	);
 }

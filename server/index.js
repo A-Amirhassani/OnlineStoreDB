@@ -8,6 +8,8 @@ const app = express();
 const session = require('express-session');
 
 const itemsRouter = require('./routes/items');
+const usersRoutes = require('./routes/users');
+const favoritesRouter = require('./routes/favorites');
 
 app.use(
 	cors({
@@ -31,6 +33,8 @@ app.use(
 );
 app.use('/api/items', itemsRouter);
 app.use('/api/reviews', reviewsRoute);
+app.use('/api/users', usersRoutes);
+app.use('/api/favorites', favoritesRouter);
 
 const db = mysql.createConnection({
 	user: 'root',
@@ -287,7 +291,6 @@ app.post('/api/items', (req, res) => {
 	);
 });
 
-
 app.get('/api/items', (req, res) => {
 	const sql = `SELECT items.id, items.owner_username, items.title, items.description, items.price, 
        GROUP_CONCAT(item_categories.category) as categories
@@ -295,158 +298,39 @@ app.get('/api/items', (req, res) => {
        LEFT JOIN loginsystem.item_categories ON items.id = item_categories.item_id
        GROUP BY items.id`;
 
-
 	db.query(sql, (err, result) => {
 		if (err) {
 			console.error(err);
 			return res.status(500).json({ error: err });
 		}
-		console.log('Items:', result); // Log the result
+		// console.log('Items:', result); // Log the result
 		return res.json(result);
 	});
-});
-
-
-
-app.get('/api/items/search', async (req, res) => {
-	const { category } = req.query;
-
-	try {
-		let items;
-		if (category) {
-			items = await Item.find({ categories: category });
-		} else {
-			items = await Item.find({});
-		}
-		res.send(items);
-	} catch (error) {
-		console.log(error);
-		res.status(500).send('Error fetching items');
-	}
 });
 
 app.post('/api/item-categories', (req, res) =>
 	insertItemCategories(req, res, db)
 );
+// const insertItemCategories = async (req, res, db) => {
+// 	const { item_id, categories } = req.body;
 
-//Phase 3 number 2
-app.get('/sameDayItems', (req, res) => {
-	//categ1 should be set to the first category the user inputs
-	const categ1 = 'gaming';
-	//categ2 should be set to the second category the user inputs
-	const categ2 = 'office';
+// 	if (!Array.isArray(categories) || !item_id) {
+// 		res.status(400).send('Invalid request data');
+// 		return;
+// 	}
 
-	//add % needed for sql to work properly
-	const category1 = "%" + categ1 + "%"
-	const category2 = "%" + categ2 + "%"
-
-	const sql = 
-				`select distinct a.owner_username 
-				from loginsystem.items a, loginsystem.items b
-				where a.category like ?
-				and b.category like ?
-				AND cast(a.post_date as date) = cast(b.post_date as date)
-				and a.owner_username = b.owner_username
-				and a.id != b.id
-				`
-	const params = [category1, category2];
-	db.execute(sql,params,(err, result) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).json({ error: err });
-		}
-		console.log('#2 Result', result); // Log the result
-		return res.json(result);
-	});
-});
-
-//phase 3 number 3
-app.get('/allGoodExcellentReviews', (req, res) => {
-	//categ1 should be set to the first category the user inputs
-	const vendorUsername = 'jaimetorrico'
-
-	const sql = 
-				`select distinct itemID, title
-				from (
-					SELECT i.id as itemID, i.title, i.owner_username as vendor, r.username as buyer, r.rating
-					FROM items i JOIN reviews r
-					ON i.id = r.item_id
-					where i.owner_username = ?) as joinedReviews
-				
-				where joinedReviews.itemID NOT IN
-					(select i.id as itemID
-					from items i JOIN reviews r
-					on i.id = r.item_id
-					where r.rating in ('fair', 'poor'))
-				`
-	const params = [vendorUsername];
-	db.execute(sql,params,(err, result) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).json({ error: err });
-		}
-		console.log('#2 Result', result); // Log the result
-		return res.json(result);
-	});
-});
-
-//phase 3 number 4
-app.get('/mostItemsPosted', (req, res) => {
-	//categ1 should be set to the first category the user inputs
-	const vendorUsername = 'jaimetorrico'
-
-	const sql = 
-				`select owner_username as vendors
-				from (
-					select owner_username, count(*) as count
-						from loginsystem.items
-						group by owner_username
-					) as topVendors
-				where topVendors.count = (
-					select max(count)
-						from (
-							select owner_username, count(*) as count
-							from loginsystem.items
-							group by owner_username
-						) as itemsCount
-				)`
-	const params = [vendorUsername];
-	db.execute(sql,params,(err, result) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).json({ error: err });
-		}
-		console.log('#2 Result', result); // Log the result
-		return res.json(result);
-	});
-});
-
-//phase 3 number 5
-app.get('/favoritedByXAndY', (req, res) => {//users returned are favorited by both userX and userY
-	//userX should be the first user choose by the user
-	const userX = 'david'
-	//UserY should be the second user choose by the user
-	const userY = 'Jimmy'
-
-	const sql = 
-				`select buyer1Favs.seller
-				from
-					(select seller 
-					from favorite_users
-					where buyer = ?) as buyer1Favs
-				join 
-					(select seller 
-					from favorite_users
-					where buyer = ?) as buyer2Favs
-				on buyer1Favs.seller = buyer2Favs.seller `
-	const params = [userX, userY];
-	db.execute(sql,params,(err, result) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).json({ error: err });
-		}
-		console.log('#2 Result', result); // Log the result
-		return res.json(result);
-	});
-});
-
+// 	try {
+// 		for (const category of categories) {
+// 			await db
+// 				.promise()
+// 				.execute(
+// 					'INSERT INTO item_categories (category, item_id) VALUES (?, ?)',
+// 					[category, item_id]
+// 				);
+// 		}
+// 		res.status(201).send('Categories added successfully');
+// 	} catch (err) {
+// 		console.error(err);
+// 		res.status(500).send('Error inserting categories');
+// 	}
+// };
