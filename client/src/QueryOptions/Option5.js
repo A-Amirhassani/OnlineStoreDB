@@ -35,7 +35,7 @@ function Option5() {
 
 	return (
 		<div>
-			<h3>List users favorited by both User X and User Y</h3>
+			<h3>5.List users favorited by both User X and User Y</h3>
 			<label htmlFor="userX">Select User X:</label>
 			<select
 				id="userX"
