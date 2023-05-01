@@ -106,6 +106,25 @@ router.get('/neverPostedExcellent', async (req, res) => {
   }
 } );
 
+//phase 3 number 7
+router.get('/neverPostedPoorReview', async (req, res) => {
+	//Users that have never posted a poor review
+	const sql = `Select distinct username
+				 from loginsystem.reviews
+				 where reviews.username not in
+					 (SELECT reviews.username 
+					 FROM loginsystem.reviews
+					 where reviews.rating = 'poor')`;
+	try {
+		const [result] = await db.query(sql);
+		console.log('#7 Result', result); // Log the result
+		return res.json(result);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err });
+	}
+});
+
 
 //phase 3 number 10
 router.get('/phase_3_number_10', async (req, res) => {

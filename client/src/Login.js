@@ -30,7 +30,7 @@ function Login(props) {
 	const initializeDB = () => {
 		// Axios.post( 'http://localhost:3001/initializeDB', null )
 		// Axios.get('http://localhost:3001/sameDayItems', null)
-		Axios.get('http://localhost:3001/api/users/phase_3_number_10', null)
+		Axios.get('http://localhost:3001/api/users/neverPostedPoorReview', null)
 			.then((response) => {
 				console.log(response.data);
 			})
