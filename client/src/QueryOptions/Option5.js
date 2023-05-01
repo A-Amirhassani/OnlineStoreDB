@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './CloseButton.css';
 
 function Option5() {
 	const [users, setUsers] = useState([]);
@@ -33,9 +34,13 @@ function Option5() {
 		}
 	};
 
+	const handleCloseResults = () => {
+		setVisible(false);
+	};
+
 	return (
 		<div>
-			<h3>List users favorited by both User X and User Y</h3>
+			<h3>5.List users favorited by both User X and User Y</h3>
 			<label htmlFor="userX">Select User X:</label>
 			<select
 				id="userX"
@@ -67,6 +72,9 @@ function Option5() {
 			</button>
 			{visible && (
 				<div>
+					<button className="close-button" onClick={handleCloseResults}>
+						
+					</button>
 					<table>
 						<thead>
 							<tr>

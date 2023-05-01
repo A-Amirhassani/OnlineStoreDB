@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import axios from 'axios';
+import React, { useState } from 'react';
+import './CloseButton.css';
 
 function Option3() {
 	const [results, setResults] = useState([]);
@@ -16,6 +17,10 @@ function Option3() {
 		} catch (error) {
 			console.error(error);
 		}
+	};
+
+	const handleCloseResults = () => {
+		setShowResults(false);
 	};
 
 	const displayResults = () => {
@@ -46,15 +51,20 @@ function Option3() {
 			</button>
 			{/* Display results here */}
 			{showResults && (
-				<table className="results-table">
-					<thead>
-						<tr>
-							<th>Item ID</th>
-							<th>Title</th>
-						</tr>
-					</thead>
-					<tbody>{displayResults()}</tbody>
-				</table>
+				<div>
+					<button className="close-button" onClick={handleCloseResults}>
+						
+					</button>
+					<table className="results-table">
+						<thead>
+							<tr>
+								<th>Item ID</th>
+								<th>Title</th>
+							</tr>
+						</thead>
+						<tbody>{displayResults()}</tbody>
+					</table>
+				</div>
 			)}
 		</div>
 	);

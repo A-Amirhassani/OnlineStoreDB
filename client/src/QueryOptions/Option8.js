@@ -2,37 +2,35 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './CloseButton.css';
 
-function Option4() {
-	const [results, setResults] = useState([]);
+function Option8() {
+	const [users, setUsers] = useState([]);
 	const [visible, setVisible] = useState(false);
 
-	const getTopUsersSinceDate = async () => {
+	const getUsersWithOnlyPoorReviews = async () => {
 		try {
 			const res = await axios.get(
-				'http://localhost:3001/api/users/mostItemsPosted'
+				'http://localhost:3001/api/users/phase_3_number_8'
 			);
-			setResults(res.data);
+			setUsers(res.data);
 			setVisible(true);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
-	const handleClose = () => {
+	const handleCloseResults = () => {
 		setVisible(false);
 	};
 
 	return (
 		<div>
-			<h3>
-				4.Users with most posts since 5/1/2020 (inclusive) with tie-break.
-			</h3>
-			<button onClick={getTopUsersSinceDate}>
-				List Users with Most Items Posted Since 5/1/2020
+			<h3>8. Users who posted some reviews, but each of them is "poor"</h3>
+			<button onClick={getUsersWithOnlyPoorReviews}>
+				Get Users with only "poor" reviews
 			</button>
 			{visible && (
 				<div>
-					<button className="close-button" onClick={handleClose}>
+					<button className="close-button" onClick={handleCloseResults}>
 						
 					</button>
 					<table>
@@ -42,9 +40,9 @@ function Option4() {
 							</tr>
 						</thead>
 						<tbody>
-							{results.map((result, index) => (
+							{users.map((user, index) => (
 								<tr key={index}>
-									<td>{result.vendors}</td>
+									<td>{user.username}</td>
 								</tr>
 							))}
 						</tbody>
@@ -55,4 +53,4 @@ function Option4() {
 	);
 }
 
-export default Option4;
+export default Option8;

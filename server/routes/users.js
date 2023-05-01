@@ -106,6 +106,72 @@ router.get('/neverPostedExcellent', async (req, res) => {
   }
 } );
 
+//phase 3 number 7
+router.get('/neverPostedPoorReview', async (req, res) => {
+	//Users that have never posted a poor review
+	const sql = `Select distinct username
+				 from loginsystem.reviews
+				 where reviews.username not in
+					 (SELECT reviews.username 
+					 FROM loginsystem.reviews
+					 where reviews.rating = 'poor')`;
+	try {
+		const [result] = await db.query(sql);
+		console.log('#7 Result', result); // Log the result
+		return res.json(result);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err });
+	}
+} );
+
+
+//phase 3 number 8
+router.get('/phase_3_number_8', async (req, res) => {
+	//Users that have only posted poor reviews
+	const sql = `Select distinct username
+				 FROM 
+					 (SELECT distinct username
+					 FROM loginsystem.reviews
+					 where reviews.rating = 'poor'
+					 ) as poorReviews
+				 where poorReviews.username not in 
+					 (SELECT distinct username
+					 FROM loginsystem.reviews
+					 where reviews.rating != 'poor')`;
+	try {
+		const [result] = await db.query(sql);
+		console.log('#8 Result', result); // Log the result
+		return res.json(result);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err });
+	}
+});
+
+
+//phase 3 number 9
+router.get('/phase_3_number_9', async (req, res) => {
+	//Users that have never recieved poor reviews for items they have posted
+	const sql = `select distinct owner_username
+				 from loginsystem.items
+				 where items.owner_username not in
+					 (Select distinct owner_username as poorUsers
+						 from loginsystem.items JOIN(
+						 select distinct item_id as id
+						 from loginsystem.reviews
+						 where rating = 'poor') as poorReviewItems
+						 on items.id = poorReviewItems.id)`;
+		try {
+			const [result] = await db.query(sql);
+			console.log('#9 Result', result); // Log the result
+			return res.json(result);
+		} catch (err) {
+			console.error(err);
+			return res.status(500).json({ error: err });
+		}
+});
+
 
 //phase 3 number 10
 router.get('/phase_3_number_10', async (req, res) => {

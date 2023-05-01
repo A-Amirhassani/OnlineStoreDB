@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './CloseButton.css';
 
 function Option2() {
 	const [results, setResults] = useState([]);
@@ -19,16 +20,36 @@ function Option2() {
 		}
 	};
 
+	const handleCloseResults = () => {
+		setShowResults(false);
+	};
+
 	const displayResults = () => {
 		if (!showResults) {
 			return null;
 		}
 
-		return results.map((result, index) => (
-			<tr key={index}>
-				<td>{result.owner_username}</td>
-			</tr>
-		));
+		return (
+			<div>
+				<button className="close-button" onClick={handleCloseResults}>
+					
+				</button>
+				<table>
+					<thead>
+						<tr>
+							<th>Username</th>
+						</tr>
+					</thead>
+					<tbody>
+						{results.map((result, index) => (
+							<tr key={index}>
+								<td>{result.owner_username}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		);
 	};
 
 	return (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './CloseButton.css';
 
 function Option1() {
 	const [results, setResults] = useState([]);
@@ -23,13 +24,14 @@ function Option1() {
 
 	return (
 		<div>
+			<h3>1. List the most expensive items in each category.</h3>
 			<button onClick={getMostExpensiveItems}>
-				1.Get Most Expensive Items in Each Category
+				Get Most Expensive Items in Each Category
 			</button>
 			{visible && (
 				<div className="results-container">
 					<button className="close-button" onClick={handleClose}>
-						X
+						
 					</button>
 					<table className="results-table">
 						<thead>
