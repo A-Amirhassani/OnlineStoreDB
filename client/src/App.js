@@ -4,6 +4,7 @@ import Login from './Login';
 import Register from './Register';
 import AddItemForm from './AddItemForm';
 import Dashboard from './Dashboard';
+import QueryResults from './QueryResults';
 
 function App() {
 	const [isAuthenticated, setIsAuthenticated] = useState(
@@ -13,7 +14,6 @@ function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				
 				<Route path="/" element={<Navigate to="/login" />} />
 				<Route
 					path="/login"
@@ -25,6 +25,8 @@ function App() {
 				) : null}
 
 				<Route path="/add-item" element={<AddItemForm />} />
+				<Route path="/query-results" element={QueryResults} />
+
 				<Route path="*" element={<Navigate to="/login" />} />
 			</Routes>
 		</BrowserRouter>
