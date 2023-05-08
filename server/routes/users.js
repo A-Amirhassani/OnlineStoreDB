@@ -176,47 +176,65 @@ router.get('/phase_3_number_9', async (req, res) => {
 //phase 3 number 10
 router.get('/phase_3_number_10', async (req, res) => {
 	//Users that gave eachother excellent reviews for every single item they posted
-	const sql = `Select reviewer1, vendor1
-				 from (
-					 Select *
-					 from (SELECT r.rating as rating1, r.username as reviewer1, i.owner_username as vendor1
-					 FROM reviews as r
-					 left JOIN items as i
-						 on r.item_id = i.id
-						 where r.username != i.owner_username
-					 ) as t1, 
-					 (SELECT r.rating as rating2, r.username as reviewer2, i.owner_username as vendor2
-					 FROM reviews as r
-					 JOIN items as i
-					 where r.item_id = i.id
-					 ) as t2
-					 where t1.reviewer1 = t2.vendor2
-					 and t1.vendor1 = t2.reviewer2
-					 )as reviews1
-				 where reviews1.rating1 = 'excellent'
-				 and reviews1.rating2 = 'excellent'
-				 
-				 
-				 and (reviewer1, vendor1, reviewer2, vendor2) 
-				 not in (
-					 Select reviews1.reviewer1, reviews1.vendor1, reviews1.reviewer2, reviews1.vendor2
-						 from (
-							 Select *
-							 from (SELECT r.rating as rating1, r.username as reviewer1, i.owner_username as vendor1
-								 FROM reviews as r
-								 left JOIN items as i
-								 on r.item_id = i.id
-								 where r.username != i.owner_username
-								 and r.rating != 'excellent'
-							 )as t1, (SELECT r.rating as rating2, r.username as reviewer2, i.owner_username as vendor2
-							 FROM reviews as r
-							 JOIN items as i
-							 where r.item_id = i.id) as t2
-						 where t1.reviewer1 = t2.vendor2
-						 and t1.vendor1 = t2.reviewer2
-						 )as reviews1
-				 )
-				 LIMIT 1;`;
+	const sql = `Select distinct reviewer1, vendor1
+	from (
+		Select *
+		from (SELECT r.rating as rating1, r.username as reviewer1, i.owner_username as vendor1
+		FROM reviews as r
+		left JOIN items as i
+			on r.item_id = i.id
+			where r.username != i.owner_username
+		) as t1, 
+		(SELECT r.rating as rating2, r.username as reviewer2, i.owner_username as vendor2
+		FROM reviews as r
+		JOIN items as i
+		where r.item_id = i.id
+		) as t2
+		where t1.reviewer1 = t2.vendor2
+		and t1.vendor1 = t2.reviewer2
+		)as reviews1
+	where reviews1.rating1 = 'excellent'
+	and reviews1.rating2 = 'excellent'
+	
+	
+	and (reviewer1, vendor1, reviewer2, vendor2) 
+	not in (
+		Select reviews1.reviewer1, reviews1.vendor1, reviews1.reviewer2, reviews1.vendor2
+			from (
+				Select *
+				from (SELECT r.rating as rating1, r.username as reviewer1, i.owner_username as vendor1
+					FROM reviews as r
+					left JOIN items as i
+					on r.item_id = i.id
+					where r.username != i.owner_username
+					and r.rating != 'excellent'
+				)as t1, (SELECT r.rating as rating2, r.username as reviewer2, i.owner_username as vendor2
+				FROM reviews as r
+				JOIN items as i
+				where r.item_id = i.id) as t2
+			where t1.reviewer1 = t2.vendor2
+			and t1.vendor1 = t2.reviewer2
+			)as reviews1
+	)
+	and (reviewer2, vendor2, reviewer1, vendor1) 
+	not in (
+		Select reviews1.reviewer1, reviews1.vendor1, reviews1.reviewer2, reviews1.vendor2
+			from (
+				Select *
+				from (SELECT r.rating as rating1, r.username as reviewer1, i.owner_username as vendor1
+					FROM reviews as r
+					left JOIN items as i
+					on r.item_id = i.id
+					where r.username != i.owner_username
+					and r.rating != 'excellent'
+				)as t1, (SELECT r.rating as rating2, r.username as reviewer2, i.owner_username as vendor2
+				FROM reviews as r
+				JOIN items as i
+				where r.item_id = i.id) as t2
+			where t1.reviewer1 = t2.vendor2
+			and t1.vendor1 = t2.reviewer2
+			)as reviews1
+	)`;
 	try {
 		const [result] = await db.query(sql);
 		console.log('#10 Result', result); // Log the result
